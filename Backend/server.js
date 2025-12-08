@@ -20,15 +20,25 @@ app.use("/api/upload", uploadRoutes);
 const vehicleRoutes = require("./routes/vehicleRoutes");
 app.use("/api/vehicles", vehicleRoutes);
 
+const ratingRoutes = require("./routes/ratingRoutes");
+app.use("/api/ratings", ratingRoutes);
+
+const authRoutes = require("./routes/authRoutes");
+app.use("/api/auth", authRoutes);
+
+const reportRoutes = require("./routes/reportRoutes");
+app.use("/api/reports", reportRoutes);
+
+const adminRoutes = require("./routes/adminRoutes");
+app.use("/api/admin", adminRoutes);
+
 // connect to MongoDB
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("Connected to MongoDB"))
   .catch(err => console.error("DB connection error:", err));
 
-// routes (we will create this file next)
-const reportRoutes = require("./routes/reportRoutes");
-app.use("/api/reports", reportRoutes);
+
 
 app.listen(process.env.PORT, () =>
   console.log(`Server running on port ${process.env.PORT}`)

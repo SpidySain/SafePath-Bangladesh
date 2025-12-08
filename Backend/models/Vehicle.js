@@ -10,7 +10,16 @@ const vehicleSchema = new mongoose.Schema(
     numberPlate: { type: String },
     issuingAuthority: { type: String },
     issuanceDate: { type: Date },
-    metadata: { type: mongoose.Schema.Types.Mixed, default: {} }
+    metadata: { type: mongoose.Schema.Types.Mixed, default: {} },
+  
+    driver: { 
+      type: mongoose.Schema.Types.ObjectId, 
+      ref: "Driver", 
+      default: null 
+    },
+
+    routeName: { type: String },
+    operator: { type: String }
   },
   { timestamps: true }
 );

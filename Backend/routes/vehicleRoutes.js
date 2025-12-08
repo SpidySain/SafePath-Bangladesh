@@ -1,74 +1,86 @@
 const express = require("express");
+const Vehicle = require("../models/Vehicle");
+const Driver = require("../models/Driver");
+const { authMiddleware, adminOnly } = require("../middleware/authMiddleware");
+
 const router = express.Router();
 
-const Vehicle = require("../models/Vehicle");
-const Report = require("../models/Report");
-
-const ALLOWED_FIELDS = [
-  "model",
-  "type",
-  "category",
-  "registrationNumber",
-  "numberPlate",
-  "issuingAuthority",
-  "issuanceDate",
-  "metadata"
-];
-
-function pickVehicleUpdates(body = {}) {
-  const updates = {};
-  for (const key of ALLOWED_FIELDS) {
-    if (body[key] !== undefined) {
-      updates[key] = body[key];
-    }
-  }
-  return updates;
-}
-
-// Fetch a vehicle and its issue history using the QR code value
-router.get("/qr/:qrValue", async (req, res) => {
+/**
+ * ADMIN: Create a vehicle
+ */
+router.post("/", authMiddleware, adminOnly, async (req, res) => {
   try {
-    const { qrValue } = req.params;
-    const vehicle = await Vehicle.findOne({ qrCode: qrValue });
+    const {
+      qrCode,
+      model,
+      type,
+      category,
+      registrationNumber,
+      numberPlate,
+      issuingAuthority,
+      issuanceDate,
+      metadata,
+      driverId,
+      routeName,
+      operator
+    } = req.body;
+
+    const vehicle = await Vehicle.create({
+      qrCode,
+      model,
+      type,
+      category,
+      registrationNumber,
+      numberPlate,
+      issuingAuthority,
+      issuanceDate,
+      metadata,
+      driver: driverId || null,
+      routeName,
+      operator
+    });
+
+    res.status(201).json(vehicle);
+  } catch (err) {
+    console.error("Vehicle creation error:", err);
+    res.status(500).json({ message: "Error creating vehicle", error: err.message });
+  }
+});
+
+/**
+ * PUBLIC: Get vehicle info via QR
+ * (important for rating system)
+ */
+router.get("/from-qr/:qrData", async (req, res) => {
+  try {
+    const { qrData } = req.params;
+
+    const vehicle = await Vehicle.findOne({ qrCode: qrData }).populate("driver");
+
     if (!vehicle) {
       return res.status(404).json({ message: "Vehicle not found for this QR" });
     }
 
-    const issueHistory = await Report.find({ vehicle: vehicle._id })
-      .populate("issueCategory")
-      .populate("location")
-      .populate("attachments")
-      .sort({ createdAt: -1 });
-
-    return res.json({ vehicle, issueHistory });
+    res.json(vehicle);
   } catch (err) {
-    console.error("Error fetching vehicle by QR:", err);
-    return res.status(500).json({ message: "Error fetching vehicle", error: err.message });
+    console.error("QR lookup error:", err);
+    res.status(500).json({ message: "Error fetching vehicle", error: err.message });
   }
 });
 
-// Update vehicle metadata (used when reporter has permission)
-router.patch("/:vehicleId", async (req, res) => {
+/**
+ * PUBLIC: List vehicles (optionally filter by route)
+ */
+router.get("/", async (req, res) => {
   try {
-    const { vehicleId } = req.params;
-    const updates = pickVehicleUpdates(req.body);
+    const filter = {};
+    if (req.query.routeName) filter.routeName = req.query.routeName;
 
-    if (Object.keys(updates).length === 0) {
-      return res.status(400).json({ message: "No updatable fields provided" });
-    }
-
-    const vehicle = await Vehicle.findByIdAndUpdate(vehicleId, updates, {
-      new: true
-    });
-
-    if (!vehicle) {
-      return res.status(404).json({ message: "Vehicle not found" });
-    }
-
-    return res.json({ message: "Vehicle updated", vehicle });
+    const vehicles = await Vehicle.find(filter).populate("driver");
+    res.json(vehicles);
   } catch (err) {
-    console.error("Error updating vehicle:", err);
-    return res.status(500).json({ message: "Error updating vehicle", error: err.message });
+    console.error("List vehicles error:", err);
+    res.status(500).json({ message: "Error fetching vehicles", error: err.message });
   }
 });
 

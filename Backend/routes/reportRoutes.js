@@ -7,6 +7,8 @@ const IssueCategory = require("../models/IssueCategory");
 const MediaAttachment = require("../models/MediaAttachment");
 const Vehicle = require("../models/Vehicle");
 
+const { authMiddleware, adminOnly } = require("../middleware/authMiddleware");
+
 const ALLOWED_VEHICLE_FIELDS = [
   "model",
   "type",
@@ -125,15 +127,54 @@ router.post("/", async (req, res) => {
  * -----------------------------------------------------
  * GET /api/reports
  * Fetch all reports (for map display)
+ * - supports filters: city, status, categoryId, vehicleId, minSeverity, maxSeverity
+ *   Example:
+ *   /api/reports?city=Dhaka&status=VERIFIED&minSeverity=3
  * -----------------------------------------------------
  */
 router.get("/", async (req, res) => {
   try {
-    const reports = await Report.find()
+    const {
+      city,
+      status,
+      categoryId,
+      vehicleId,
+      minSeverity,
+      maxSeverity
+    } = req.query;
+
+    const filter = {};
+
+    if (status) {
+      filter.status = status; // PENDING / VERIFIED / FALSE
+    }
+
+    if (categoryId) {
+      filter.issueCategory = categoryId;
+    }
+
+    if (vehicleId) {
+      filter.vehicle = vehicleId;
+    }
+
+    if (minSeverity || maxSeverity) {
+      filter.severity = {};
+      if (minSeverity) filter.severity.$gte = Number(minSeverity);
+      if (maxSeverity) filter.severity.$lte = Number(maxSeverity);
+    }
+
+    let reports = await Report.find(filter)
       .populate("location")
       .populate("issueCategory")
       .populate("vehicle")
       .populate("attachments");
+
+    // City filter is on Location, so filter in-memory after populate
+    if (city) {
+      reports = reports.filter(
+        r => r.location && r.location.city === city
+      );
+    }
 
     return res.json(reports);
   } catch (err) {
@@ -218,6 +259,47 @@ router.get("/from-qr/:qrValue", async (req, res) => {
   } catch (err) {
     console.error("QR parse error:", err);
     return res.status(500).json({ message: "Error parsing QR value", error: err.message });
+  }
+});
+
+/**
+ * -----------------------------------------------------
+ * PATCH /api/reports/:id/status
+ * Admin-only:
+ * - Update report status: PENDING / VERIFIED / FALSE
+ * (Used in admin dashboard for verification)
+ * -----------------------------------------------------
+ */
+router.patch("/:id/status", authMiddleware, adminOnly, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!["PENDING", "VERIFIED", "FALSE"].includes(status)) {
+      return res.status(400).json({ message: "Invalid status value" });
+    }
+
+    const report = await Report.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true }
+    )
+      .populate("location")
+      .populate("issueCategory")
+      .populate("vehicle")
+      .populate("attachments");
+
+    if (!report) {
+      return res.status(404).json({ message: "Report not found" });
+    }
+
+    return res.json({
+      message: "Status updated",
+      report
+    });
+  } catch (err) {
+    console.error("Error updating report status:", err);
+    return res.status(500).json({ message: "Server error", error: err.message });
   }
 });
 
