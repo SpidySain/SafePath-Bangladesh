@@ -2,6 +2,7 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
+const { authMiddleware } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
@@ -80,6 +81,12 @@ router.post("/login", async (req, res) => {
     console.error("Login error:", err);
     res.status(500).json({ message: "Server error", error: err.message });
   }
+});
+
+// GET /api/auth/me - returns current authenticated user
+router.get("/me", authMiddleware, async (req, res) => {
+  // req.user is attached in authMiddleware (password excluded)
+  res.json({ user: req.user });
 });
 
 module.exports = router;

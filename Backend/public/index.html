@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SafePath - Login / Signup</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>SafePath</h1>
+    </header>
+
+    <main class="card">
+      <div class="tabs">
+        <button id="tab-login" class="tab active">Login</button>
+        <button id="tab-signup" class="tab">Sign Up</button>
+      </div>
+
+      <section id="login-form" class="form active">
+        <label>Email
+          <input type="email" id="login-email" placeholder="you@example.com" />
+        </label>
+        <label>Password
+          <input type="password" id="login-password" placeholder="Your password" />
+        </label>
+        <button id="btn-login" class="btn primary">Login</button>
+        <div id="login-msg" class="msg"></div>
+      </section>
+
+      <section id="signup-form" class="form">
+        <label>Name
+          <input type="text" id="signup-name" placeholder="Your name" />
+        </label>
+        <label>Email
+          <input type="email" id="signup-email" placeholder="you@example.com" />
+        </label>
+        <label>Password
+          <input type="password" id="signup-password" placeholder="Choose a password" />
+        </label>
+        <button id="btn-signup" class="btn secondary">Create Account</button>
+        <div id="signup-msg" class="msg"></div>
+      </section>
+
+      <section id="profile" class="form">
+        <p id="welcome">Hello, <span id="user-name"></span></p>
+        <p id="user-email"></p>
+        <button id="btn-logout" class="btn">Logout</button>
+      </section>
+
+    </main>
+
+    <footer>
+      <small>SafePath — Simple auth demo</small>
+    </footer>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
