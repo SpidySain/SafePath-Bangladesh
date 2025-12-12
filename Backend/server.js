@@ -16,8 +16,8 @@ app.use((req, res, next) => {
 // serve uploaded files statically
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// serve frontend static files from public (index.html + bundle)
-app.use(express.static(path.join(__dirname, 'public')));
+// serve frontend static files from top-level Frontend folder
+app.use(express.static(path.join(__dirname, '..', 'Frontend')));
 console.log('Static assets served from:', path.join(__dirname, 'public'));
 
 const categoryRoutes = require("./routes/categoryRoutes");
