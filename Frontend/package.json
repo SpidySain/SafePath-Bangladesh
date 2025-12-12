@@ -1,0 +1,8 @@
+{
+  "name": "safepath-frontend",
+  "version": "1.0.0",
+  "description": "Static login/signup SPA for SafePath",
+  "scripts": {
+    "start": "npx http-server -p 8080"
+  }
+}

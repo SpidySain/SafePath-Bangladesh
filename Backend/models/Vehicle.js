@@ -24,6 +24,7 @@ const vehicleSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-vehicleSchema.index({ qrCode: 1 }, { unique: true });
+// Unique constraint on `qrCode` is defined on the field itself (unique: true)
+// so an explicit schema.index is unnecessary and can cause duplicate index warnings.
 
 module.exports = mongoose.model("Vehicle", vehicleSchema);
