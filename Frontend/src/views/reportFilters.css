@@ -1,0 +1,54 @@
+.filters {
+  border: 1px solid var(--stroke);
+  border-radius: 12px;
+  padding: 0.85rem;
+  background: rgba(255, 255, 255, 0.02);
+  margin-bottom: 1rem;
+}
+
+.filters__row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.85rem;
+}
+
+.filters__field label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+}
+
+.filters__field input,
+.filters__field select {
+  width: 100%;
+}
+
+.filters__helper {
+  margin-top: 0.2rem;
+  font-size: 0.85rem;
+}
+
+.filters__actions {
+  margin-top: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.filters__buttons {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.filters__chips {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-left: auto;
+}
