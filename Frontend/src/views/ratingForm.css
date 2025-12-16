@@ -1,0 +1,42 @@
+.rating-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+}
+
+.rating-form__row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.rating-form__stars {
+  display: inline-flex;
+  gap: 0.15rem;
+}
+
+.star {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--stroke);
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.star--active {
+  background: linear-gradient(120deg, #ffd166, #ff6b6b);
+  color: #0b0b0d;
+  border-color: rgba(255, 209, 102, 0.9);
+}
+
+.rating-form__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}

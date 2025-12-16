@@ -1,8 +1,17 @@
-Frontend for SafePath — simple static SPA for login/signup
+# SafePath Frontend
 
-Files:
-- index.html
-- styles.css
-- app.js
+This frontend is now a **React + Vite** project (main frontend).
 
-This is a simple static app served by the backend during development. To use as a separate project, deploy `Frontend` to any static host.
+## Folder structure (MVC scaffold)
+- `src/models` — domain shapes (e.g., report, category)
+- `src/controllers` — data-access and orchestration
+- `src/views` — UI components and pages
+- `src/config/apiClient.js` — API base URL + helpers
+- `src/context/AuthContext.jsx` — lightweight auth state
+
+## Getting started
+
+```bash
+cd frontend
+npm install
+npm run dev
