@@ -1,0 +1,7 @@
+.admin-filters {
+  border: 1px solid var(--stroke);
+  border-radius: 12px;
+  padding: 0.85rem;
+  background: rgba(255, 255, 255, 0.02);
+  margin-bottom: 1rem;
+}
