@@ -8,6 +8,8 @@ require("dotenv").config();
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+const PORT = process.env.PORT || 5000;
 // Debug: simple request logging to aid static file serving troubleshooting
 app.use((req, res, next) => {
   console.log('REQ', req.method, req.path);
@@ -54,7 +56,6 @@ app.use((req, res, next) => {
 });
 
 // ensure required env is present
-const PORT = process.env.PORT || 3000;
 if (!process.env.MONGO_URI || typeof process.env.MONGO_URI !== "string") {
   console.error("MONGO_URI is not set. See .env.example and set MONGO_URI accordingly.");
   process.exit(1);
@@ -63,7 +64,6 @@ if (!process.env.JWT_SECRET || typeof process.env.JWT_SECRET !== "string") {
   console.error("JWT_SECRET is not set. Add JWT_SECRET to your .env file (see .env.example).");
   process.exit(1);
 }
-
 // connect to MongoDB
 mongoose
   .connect(process.env.MONGO_URI)
