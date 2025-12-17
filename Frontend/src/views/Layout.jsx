@@ -4,10 +4,15 @@ import { Link, useLocation } from "react-router-dom";
 export default function Layout({ title, children }) {
   const location = useLocation();
 
+    // ✅ read saved user (from localStorage)
+  const user = JSON.parse(localStorage.getItem("user") || "null");
+  const isAdmin = user?.role === "ADMIN";
+
   const navItems = [
+    { to: "/map", label: "Map" },
     { to: "/filter-reports", label: "Filter Reports" },
     { to: "/reports", label: "Reports" },
-    { to: "/admin", label: "Admin" },
+    ...(isAdmin ? [{ to: "/admin", label: "Admin" }] : []), // ✅ only show for ADMIN
     { to: "/qr", label: "QR" }
   ];
 

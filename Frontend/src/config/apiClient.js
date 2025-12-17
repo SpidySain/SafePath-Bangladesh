@@ -20,15 +20,25 @@ export async function apiPost(path, body) {
   return res.json();
 }
 
+
+//const ADMIN_KEY = import.meta.env.VITE_ADMIN_KEY || "";
+
 export async function apiPatch(path, body) {
+  const token = localStorage.getItem("safepath-token"); // 
+
   const res = await fetch(`${API_BASE_URL}${path}`, {
     method: "PATCH",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    },
     body: JSON.stringify(body)
   });
+
   if (!res.ok) throw new Error(`PATCH ${path} failed with ${res.status}`);
   return res.json();
 }
+
 
 export async function apiUpload(path, formData) {
   const res = await fetch(`${API_BASE_URL}${path}`, {

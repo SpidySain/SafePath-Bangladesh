@@ -1,26 +1,25 @@
+// src/views/ReportMap.jsx
 import { useMemo } from "react";
-import { GoogleMap, Circle, MarkerF, InfoWindowF, useJsApiLoader } from "@react-google-maps/api";
+import { MapContainer, TileLayer, Circle, CircleMarker, Popup } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
 import { severityColor, severityRadiusMeters } from "../utils/map";
 import "./map.css";
 
 const defaultCenter = { lat: 23.8103, lng: 90.4125 }; // Dhaka
 
-export default function ReportMap({ reports }) {
-  const { isLoaded, loadError } = useJsApiLoader({
-    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ""
-  });
-
+export default function ReportMap({ reports = [] }) {
   const points = useMemo(() => {
     return (reports || [])
       .filter(r => r.location?.latitude && r.location?.longitude)
       .map(r => {
         const lat = Number(r.location.latitude);
         const lng = Number(r.location.longitude);
+
         return {
           id: r._id || r.id || `${lat}-${lng}-${r.createdAt}`,
           lat,
           lng,
-          severity: r.severity ?? 3,
+          severity: Number(r.severity ?? 3),
           status: r.status ?? "PENDING",
           label: r.issueCategory?.name || "Issue",
           description: r.description || "",
@@ -36,39 +35,27 @@ export default function ReportMap({ reports }) {
     ? { lat: points[0].lat, lng: points[0].lng }
     : defaultCenter;
 
-  if (loadError) {
-    return <div className="muted">Map failed to load: {loadError.message}</div>;
-  }
-
-  if (!isLoaded) {
-    return <div className="muted">Loading Google Map...</div>;
-  }
-
   return (
     <div className="map-container">
-      <GoogleMap
-        mapContainerClassName="map-canvas"
-        center={center}
-        zoom={12}
-        options={{
-          styles: mapStyle,
-          disableDefaultUI: false,
-          streetViewControl: false,
-          mapTypeControl: false
-        }}
-      >
-        {points.map(point => {
-          const color = severityColor(point.severity, point.status);
-          const radius = severityRadiusMeters(point.severity);
+      <MapContainer center={center} zoom={12} className="leaflet-map">
+        <TileLayer
+          attribution='&copy; OpenStreetMap contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+
+        {/* Color-coded zones (circles) */}
+        {points.map(p => {
+          const color = severityColor(p.severity);
+          const radius = severityRadiusMeters(p.severity);
           return (
             <Circle
-              key={`c-${point.id}`}
-              center={{ lat: point.lat, lng: point.lng }}
+              key={`zone-${p.id}`}
+              center={[p.lat, p.lng]}
               radius={radius}
-              options={{
-                strokeColor: color,
-                strokeOpacity: 0.8,
-                strokeWeight: 2,
+              pathOptions={{
+                color,
+                weight: 2,
+                opacity: 0.8,
                 fillColor: color,
                 fillOpacity: 0.25
               }}
@@ -76,66 +63,36 @@ export default function ReportMap({ reports }) {
           );
         })}
 
-        {points.map(point => {
-          const color = severityColor(point.severity, point.status);
+        {/* Color-coded markers */}
+        {points.map(p => {
+          const color = severityColor(p.severity);
           return (
-            <MarkerF
-              key={`m-${point.id}`}
-              position={{ lat: point.lat, lng: point.lng }}
-              icon={{
-                path: window.google.maps.SymbolPath.CIRCLE,
-                scale: 7,
+            <CircleMarker
+              key={`marker-${p.id}`}
+              center={[p.lat, p.lng]}
+              radius={7}
+              pathOptions={{
+                color: "#ffffff",
+                weight: 2,
                 fillColor: color,
-                fillOpacity: 1,
-                strokeColor: "#fff",
-                strokeWeight: 2
+                fillOpacity: 1
               }}
             >
-              <InfoWindowF>
+              <Popup>
                 <div className="map-info">
-                  <strong>{point.label}</strong>
-                  <div className="muted">{point.locationLabel}</div>
-                  <div>{point.description || "No description."}</div>
-                  <div className="muted">
-                    Severity: {point.severity} | Status: {point.status}
-                  </div>
-                  {point.createdAt && (
-                    <div className="muted">
-                      {new Date(point.createdAt).toLocaleString()}
-                    </div>
+                  <strong>{p.label}</strong>
+                  <div className="muted">{p.locationLabel}</div>
+                  <div>{p.description || "No description."}</div>
+                  <div className="muted">Severity: {p.severity} | Status: {p.status}</div>
+                  {p.createdAt && (
+                    <div className="muted">{new Date(p.createdAt).toLocaleString()}</div>
                   )}
                 </div>
-              </InfoWindowF>
-            </MarkerF>
+              </Popup>
+            </CircleMarker>
           );
         })}
-      </GoogleMap>
+      </MapContainer>
     </div>
   );
 }
-
-// Dark-ish map style for contrast
-const mapStyle = [
-  { elementType: "geometry", stylers: [{ color: "#102231" }] },
-  { elementType: "labels.text.stroke", stylers: [{ color: "#102231" }] },
-  { elementType: "labels.text.fill", stylers: [{ color: "#8ecae6" }] },
-  {
-    featureType: "road",
-    elementType: "geometry",
-    stylers: [{ color: "#1c3a4f" }]
-  },
-  {
-    featureType: "road",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#8ecae6" }]
-  },
-  {
-    featureType: "water",
-    elementType: "geometry",
-    stylers: [{ color: "#1b4965" }]
-  },
-  {
-    featureType: "poi",
-    stylers: [{ visibility: "off" }]
-  }
-];

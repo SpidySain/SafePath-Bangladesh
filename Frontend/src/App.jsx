@@ -6,6 +6,7 @@ import ReportsPage from "./pages/ReportsPage";
 import QrPage from "./pages/QrPage";
 import FilterReportsPage from "./pages/FilterReportsPage";
 import AdminReportsPage from "./pages/AdminReportsPage";
+import MapPage from "./pages/MapPage"; // 
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
       <Layout title="SafePath Frontend">
         <Routes>
           <Route path="/" element={<LandingPage />} />
+          <Route path="/map" element={<MapPage />} /> 
           <Route path="/filter-reports" element={<FilterReportsPage />} />
           <Route path="/reports" element={<ReportsPage />} />
           <Route path="/admin" element={<AdminReportsPage />} />

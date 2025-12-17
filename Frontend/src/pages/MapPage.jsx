@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import ReportMap from "../views/ReportMap";
-import { fetchReports } from "../controllers/reportController";
+import ReportMap from "../views/ReportMap"; 
+import { fetchReports } from "../controllers/reportController"; 
+
 
 export default function MapPage() {
   const [reports, setReports] = useState([]);
