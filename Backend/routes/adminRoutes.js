@@ -78,6 +78,135 @@ router.get("/monthly-reports", async (req, res) => {
 });
 
 /**
+ * GET /api/admin/monthly-analytics
+ * Returns monthly counts broken down by status (VERIFIED/PENDING/FALSE)
+ * Optional query: year=YYYY (filter to a year)
+ */
+router.get("/monthly-analytics", async (req, res) => {
+  try {
+    const yearFilter = req.query.year ? Number(req.query.year) : null;
+
+    const match = {};
+    if (yearFilter) {
+      const start = new Date(yearFilter, 0, 1);
+      const end = new Date(yearFilter + 1, 0, 1);
+      match.createdAt = { $gte: start, $lt: end };
+    }
+
+    const pipeline = [
+      { $match: match },
+      {
+        $group: {
+          _id: {
+            year: { $year: "$createdAt" },
+            month: { $month: "$createdAt" },
+            status: "$status"
+          },
+          count: { $sum: 1 }
+        }
+      },
+      { $sort: { "_id.year": 1, "_id.month": 1, "_id.status": 1 } }
+    ];
+
+    const results = await Report.aggregate(pipeline);
+
+    // pivot results into { year, month, VERIFIED, PENDING, FALSE }
+    const map = {};
+    results.forEach(r => {
+      const key = `${r._id.year}-${String(r._id.month).padStart(2, "0")}`;
+      if (!map[key]) {
+        map[key] = { year: r._id.year, month: r._id.month, VERIFIED: 0, PENDING: 0, FALSE: 0 };
+      }
+      map[key][r._id.status] = r.count;
+    });
+
+    const formatted = Object.values(map).sort((a, b) => (a.year - b.year) || (a.month - b.month));
+
+    res.json(formatted);
+  } catch (err) {
+    console.error("Monthly analytics error:", err);
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
+
+/**
+ * GET /api/admin/export
+ * Export reports as CSV for a given period.
+ * Query parameters:
+ *  - year (e.g., 2025)
+ *  - month (1-12) [optional - if provided, export that month]
+ *  - start / end ISO dates (optional range)
+ */
+router.get("/export", async (req, res) => {
+  try {
+    const { year, month, start, end } = req.query;
+
+    let filter = {};
+
+    if (start || end) {
+      filter.createdAt = {};
+      if (start) filter.createdAt.$gte = new Date(start);
+      if (end) filter.createdAt.$lte = new Date(end);
+    } else if (year) {
+      const y = Number(year);
+      const m = month ? Number(month) - 1 : 0;
+      const startDate = new Date(y, m, 1);
+      const endDate = month ? new Date(y, m + 1, 1) : new Date(y + 1, 0, 1);
+      filter.createdAt = { $gte: startDate, $lt: endDate };
+    }
+
+    const reports = await Report.find(filter)
+      .populate("location")
+      .populate("issueCategory")
+      .populate("vehicle")
+      .sort({ createdAt: 1 });
+
+    // CSV header
+    const headers = [
+      "reportId",
+      "createdAt",
+      "reporterId",
+      "city",
+      "district",
+      "address",
+      "issueCategory",
+      "severity",
+      "status",
+      "vehicle",
+      "description"
+    ];
+
+    const csvRows = [headers.join(",")];
+
+    reports.forEach(r => {
+      const row = [
+        r._id,
+        r.createdAt.toISOString(),
+        r.reporterId || "",
+        r.location?.city || "",
+        r.location?.district || "",
+        `"${(r.location?.address || "").replace(/"/g, '""')}",`,
+        r.issueCategory?.name || "",
+        r.severity || "",
+        r.status || "",
+        r.vehicle?.registrationNumber || r.vehicle?.numberPlate || "",
+        `"${(r.description || "").replace(/"/g, '""')}"`
+      ];
+      csvRows.push(row.join(","));
+    });
+
+    const csvContent = csvRows.join("\n");
+
+    res.setHeader("Content-Type", "text/csv");
+    res.setHeader("Content-Disposition", `attachment; filename=reports_export_${Date.now()}.csv`);
+    res.send(csvContent);
+  } catch (err) {
+    console.error("Export error:", err);
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
+
+/**
  * GET /api/admin/top-categories
  * returns issues grouped by category
  */

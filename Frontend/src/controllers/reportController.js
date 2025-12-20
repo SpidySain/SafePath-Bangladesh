@@ -23,6 +23,41 @@ export async function updateReportStatus(reportId, status) {
   return apiPatch(`/api/reports/${reportId}/status`, { status });
 }
 
+export async function fetchMonthlyAnalytics(year) {
+  const q = year ? `?year=${year}` : "";
+  const data = await apiGet(`/api/admin/monthly-analytics${q}`).catch(() => []);
+  return data;
+}
+
+export async function exportReportsCSV({ year, month, start, end } = {}) {
+  const params = new URLSearchParams();
+  if (year) params.set("year", year);
+  if (month) params.set("month", month);
+  if (start) params.set("start", start);
+  if (end) params.set("end", end);
+
+  const url = `/api/admin/export${params.toString() ? `?${params.toString()}` : ""}`;
+  const res = await fetch(`${API_BASE_URL}${url}`, {
+    method: "GET",
+    headers: {
+      Authorization: localStorage.getItem("safepath-token") ? `Bearer ${localStorage.getItem("safepath-token")}` : undefined
+    }
+  });
+
+  if (!res.ok) throw new Error(`Export failed with ${res.status}`);
+  const text = await res.text();
+  const blob = new Blob([text], { type: "text/csv" });
+  const link = document.createElement("a");
+  const href = URL.createObjectURL(blob);
+  link.href = href;
+  link.download = `reports_export_${year || 'all'}_${month || 'all'}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(href);
+  return true;
+}
+
 export async function uploadMedia(file) {
   const formData = new FormData();
   const mediaType = file.type?.startsWith("video") ? "VIDEO" : "PHOTO";
