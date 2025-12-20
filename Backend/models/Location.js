@@ -1,13 +1,20 @@
 const mongoose = require("mongoose");
 
-const locationSchema = new mongoose.Schema(
+const LocationSchema = new mongoose.Schema(
   {
     latitude: { type: Number, required: true },
+
     longitude: { type: Number, required: true },
-    address: { type: String },
-    city: { type: String, required: true }        // e.g. "Dhaka"
+
+    address: { type: String, default: "" },
+
+    city: { type: String, required: true },
+
+    district: { type: String, default: "" },
+    
+    upazila: { type: String, default: "" }
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Location", locationSchema);
+module.exports = mongoose.model("Location", LocationSchema);

@@ -36,6 +36,8 @@ router.post("/", async (req, res) => {
       longitude,
       address,
       city,
+      district,  
+      upazila, 
       issueCategoryId,
       severity,
       description,
@@ -56,7 +58,9 @@ router.post("/", async (req, res) => {
       latitude,
       longitude,
       address,
-      city
+      city,
+      district: district || "",
+      upazila: upazila || ""
     });
 
     // 2) Check if Issue Category exists
@@ -136,9 +140,12 @@ router.get("/", async (req, res) => {
   try {
     const {
       city,
+      district,
+      upazila,
       status,
       categoryId,
       vehicleId,
+      severity,
       minSeverity,
       maxSeverity
     } = req.query;
@@ -157,7 +164,11 @@ router.get("/", async (req, res) => {
       filter.vehicle = vehicleId;
     }
 
-    if (minSeverity || maxSeverity) {
+    if (severity !== undefined && severity !== "") {
+      filter.severity = Number(severity);
+    } 
+
+    else if (minSeverity || maxSeverity) {
       filter.severity = {};
       if (minSeverity) filter.severity.$gte = Number(minSeverity);
       if (maxSeverity) filter.severity.$lte = Number(maxSeverity);
@@ -175,6 +186,15 @@ router.get("/", async (req, res) => {
         r => r.location && r.location.city === city
       );
     }
+
+    if (district) {
+      reports = reports.filter(r => r.location && r.location.district === district);
+    }
+
+    if (upazila) {
+      reports = reports.filter(r => r.location && r.location.upazila === upazila);
+    }
+
 
     return res.json(reports);
   } catch (err) {

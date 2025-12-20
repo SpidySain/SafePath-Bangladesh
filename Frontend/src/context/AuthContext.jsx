@@ -1,3 +1,4 @@
+// src/context/AuthContext.jsx
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { apiGet, apiPost } from "../config/apiClient";
 
@@ -18,8 +19,9 @@ function loadJson(key) {
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => loadJson(USER_KEY));
   const [token, setToken] = useState(() => localStorage.getItem(TOKEN_KEY) || "");
+  const [booting, setBooting] = useState(true);
 
-  // persist
+  // persist user/token
   useEffect(() => {
     if (user) localStorage.setItem(USER_KEY, JSON.stringify(user));
     else localStorage.removeItem(USER_KEY);
@@ -30,28 +32,39 @@ export function AuthProvider({ children }) {
     else localStorage.removeItem(TOKEN_KEY);
   }, [token]);
 
-  // optional: on refresh, validate token + refresh user from backend
+  // validate token on refresh
   useEffect(() => {
-    if (!token) return;
-    apiGet("/api/auth/me")
-      .then(res => {
-        // backend returns { user: {...} }
+    const run = async () => {
+      try {
+        if (!token) {
+          setBooting(false);
+          return;
+        }
+        const res = await apiGet("/api/auth/me");
         if (res?.user) setUser(res.user);
-      })
-      .catch(() => {
-        // token invalid/expired
-        setToken("");
+        else {
+          setUser(null);
+          setToken("");
+        }
+      } catch {
         setUser(null);
-      });
+        setToken("");
+      } finally {
+        setBooting(false);
+      }
+    };
+    run();
   }, [token]);
 
   const auth = useMemo(
     () => ({
       user,
       token,
+      booting,
+      isLoggedIn: Boolean(token),
       isAdmin: user?.role === "ADMIN",
 
-      //  real login (backend)
+      // backend login
       signIn: async ({ email, password }) => {
         const data = await apiPost("/api/auth/login", { email, password });
         setUser(data.user);
@@ -59,7 +72,7 @@ export function AuthProvider({ children }) {
         return data.user;
       },
 
-      //  real register (backend)
+      // backend register
       signUp: async ({ name, email, password, role }) => {
         const data = await apiPost("/api/auth/register", { name, email, password, role });
         setUser(data.user);
@@ -72,7 +85,7 @@ export function AuthProvider({ children }) {
         setToken("");
       }
     }),
-    [user, token]
+    [user, token, booting]
   );
 
   return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>;

@@ -312,3 +312,27 @@ select:focus {
   background: rgba(120, 200, 255, 0.16);
   border-color: rgba(120, 200, 255, 0.35);
 }
+/* ---------- HERO HEADER ---------- */
+
+.hero-headline {
+  position: relative;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+}
+
+.hero-title {
+  font-size: 2.4rem;
+  font-weight: 900;
+  letter-spacing: 0.3px;
+  margin: 0;
+  background: linear-gradient(180deg, #ffffff, #dbeafe);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero-subtitle {
+  margin-top: 0.35rem;
+  font-size: 0.95rem;
+  letter-spacing: 0.3px;
+  color: rgba(255, 255, 255, 0.6);
+}

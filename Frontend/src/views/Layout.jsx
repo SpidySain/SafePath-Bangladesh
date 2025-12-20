@@ -1,45 +1,73 @@
+// src/views/Layout.jsx
 import "./layout.css";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export default function Layout({ title, children }) {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, isLoggedIn, isAdmin, signOut } = useAuth();
 
-    // ✅ read saved user (from localStorage)
-  const user = JSON.parse(localStorage.getItem("user") || "null");
-  const isAdmin = user?.role === "ADMIN";
-
-  const navItems = [
-    { to: "/map", label: "Map" },
-    { to: "/filter-reports", label: "Filter Reports" },
-    { to: "/reports", label: "Reports" },
-    ...(isAdmin ? [{ to: "/admin", label: "Admin" }] : []), // ✅ only show for ADMIN
-    { to: "/qr", label: "QR" }
-  ];
+  const handleLogout = () => {
+    signOut();
+    navigate("/login");
+  };
 
   return (
     <div className="layout">
       <header className="layout__header">
         <div className="topbar">
           <div className="brand">
-            <span className="brand__dot" /> <Link to="/">SafePath</Link>
+            <span className="brand__dot" />
+            <Link to="/">Homepage</Link>
           </div>
+
           <nav className="nav">
-            {navItems.map(item => (
+            {/*  Admin only */}
+            {isLoggedIn && isAdmin && (
               <Link
-                key={item.to}
-                to={item.to}
-                className={location.pathname === item.to ? "nav__link nav__link--active" : "nav__link"}
+                to="/admin"
+                className={location.pathname === "/admin" ? "nav__link nav__link--active" : "nav__link"}
               >
-                {item.label}
+                Admin
               </Link>
-            ))}
+            )}
+
+            {/*  Auth section */}
+            {!isLoggedIn ? (
+              <Link
+                to="/login"
+                className={location.pathname === "/login" ? "nav__link nav__link--active" : "nav__link"}
+              >
+                Login
+              </Link>
+            ) : (
+              <button
+                type="button"
+                className="nav__link"
+                onClick={handleLogout}
+                style={{ cursor: "pointer", background: "transparent" }}
+              >
+                Logout ({user?.name || "User"})
+              </button>
+            )}
           </nav>
         </div>
-        <div className="layout__headline">
-          <h1>{title}</h1>
-          <p className="layout__tagline">SafePath Bangladesh · Frontend scaffold (MVC)</p>
+
+        <div className="layout__headline hero-headline">
+          <div className="hero-accent" />
+
+          <h1 className="hero-title">
+            SafePath Bangladesh
+          </h1>
+
+          <p className="hero-subtitle">
+            Community-driven road safety platform for Bangladesh
+          </p>
         </div>
+
       </header>
+
       <main className="layout__body">{children}</main>
     </div>
   );
