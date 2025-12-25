@@ -1,7 +1,7 @@
-// src/pages/RegisterPage.jsx
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import "./loginFullscreen.css";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -11,10 +11,6 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  // For your requirement: allow making ADMIN from UI (optional).
-  // If you don't want that, force role = "USER" below.
-  //const [role, setRole] = useState("USER");
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -23,8 +19,14 @@ export default function RegisterPage() {
     setError("");
     setLoading(true);
     try {
-      await signUp({ name, email, password, role });
-      navigate("/", { replace: true });
+      await signUp({
+        name,
+        email,
+        password
+      });
+
+      // after register → go to login
+      navigate("/login", { replace: true });
     } catch (err) {
       setError(err?.message || "Registration failed");
     } finally {
@@ -33,42 +35,71 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="card" style={{ maxWidth: 520, margin: "0 auto" }}>
-      <h2 style={{ marginTop: 0 }}>Register</h2>
-      <p className="muted" style={{ marginTop: "-0.25rem" }}>
-        Create an account to submit reports and access features.
-      </p>
+    <div
+      className="login-bg"
+      style={{
+        backgroundImage: "url('/login-bg.png')" // same image as login
+      }}
+    >
+      <div className="login-overlay" />
 
-      <form className="form" onSubmit={onSubmit}>
-        <div className="form__group">
-          <label>Name</label>
-          <input value={name} onChange={e => setName(e.target.value)} required />
+      <div className="login-card">
+        {/*  traffic light */}
+        <div className="traffic-light">
+          <span className="light red" />
+          <span className="light yellow" />
+          <span className="light green" />
         </div>
 
-        <div className="form__group">
-          <label>Email</label>
-          <input value={email} onChange={e => setEmail(e.target.value)} type="email" required />
-        </div>
+        <h1 className="login-title">SafePath Bangladesh</h1>
+        <p className="login-subtitle">
+          Create an account to help improve road safety
+        </p>
 
-        <div className="form__group">
-          <label>Password</label>
-          <input value={password} onChange={e => setPassword(e.target.value)} type="password" required />
-        </div>
+        <form className="login-form" onSubmit={onSubmit}>
+          <div className="login-field">
+            <label>Name</label>
+            <input
+              type="text"
+              value={name}
+              onChange={e => setName(e.target.value)}
+              placeholder="Your name"
+              required
+            />
+          </div>
 
-        <div className="form__actions">
+          <div className="login-field">
+            <label>Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              required
+            />
+          </div>
+
+          <div className="login-field">
+            <label>Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              placeholder="Create a password"
+              required
+            />
+          </div>
+
+          {error && <div className="login-error">{error}</div>}
+
           <button type="submit" disabled={loading}>
-            {loading ? "Creating..." : "Register"}
+            {loading ? "Creating account..." : "Register"}
           </button>
-          {error && (
-            <span className="pill" style={{ background: "rgba(255,0,0,0.2)", border: "1px solid rgba(255,0,0,0.3)" }}>
-              {error}
-            </span>
-          )}
-        </div>
-      </form>
+        </form>
 
-      <div className="muted" style={{ marginTop: "0.75rem" }}>
-        Already have an account? <Link to="/login">Login</Link>
+        <div className="login-footer">
+          Already have an account? <Link to="/login">Login</Link>
+        </div>
       </div>
     </div>
   );

@@ -1,0 +1,143 @@
+/* Fullscreen background */
+.login-bg {
+  min-height: 100vh;
+  width: 100%;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  display: grid;
+  place-items: center;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont;
+}
+
+/* Light overlay for readability */
+.login-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.75),
+      rgba(245, 248, 252, 0.85)
+    );
+}
+
+/* Login card */
+.login-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 420px;
+  padding: 28px;
+  border-radius: 18px;
+
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.18);
+}
+
+/* Title */
+.login-title {
+  margin: 0;
+  text-align: center;
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: #0f2a44;
+}
+
+.login-subtitle {
+  text-align: center;
+  margin: 6px 0 20px;
+  color: #425466;
+  font-size: 0.95rem;
+}
+
+/* Form */
+.login-form {
+  display: grid;
+  gap: 14px;
+}
+
+.login-field label {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: #1f2d3d;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.login-field input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  background: rgba(255, 255, 255, 0.95);
+  font-size: 0.95rem;
+}
+
+.login-field input:focus {
+  outline: none;
+  border-color: #3bb2b8;
+  box-shadow: 0 0 0 3px rgba(59, 178, 184, 0.25);
+}
+
+/* Error */
+.login-error {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(255, 90, 90, 0.15);
+  color: #7a1f1f;
+  font-weight: 600;
+}
+
+/* Button */
+.login-form button {
+  margin-top: 8px;
+  padding: 12px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  font-weight: 800;
+  font-size: 1rem;
+
+  color: white;
+  background: linear-gradient(
+    90deg,
+    #3bb2b8,
+    #5f9cff
+  );
+}
+
+.login-form button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Footer */
+.login-footer {
+  margin-top: 16px;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #425466;
+}
+
+.login-footer a {
+  font-weight: 800;
+  color: #3b82f6;
+  text-decoration: none;
+}
+
+.login-footer a:hover {
+  text-decoration: underline;
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .login-card {
+    margin: 0 14px;
+    padding: 22px;
+  }
+}

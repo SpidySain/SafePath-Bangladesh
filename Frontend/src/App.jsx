@@ -4,7 +4,6 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import Layout from "./views/Layout";
 import AuthLayout from "./views/AuthLayout";
-import { useAuth } from "./context/AuthContext";
 
 import LandingPage from "./pages/LandingPage";
 import ReportsPage from "./pages/ReportsPage";
@@ -16,17 +15,14 @@ import MapPage from "./pages/MapPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 
-function HomeGate() {
-  const { isLoggedIn, booting } = useAuth();
-  if (booting) return null;
-  return isLoggedIn ? <LandingPage /> : <Navigate to="/login" replace />;
-}
+import AlertsPage from "./pages/AlertsPage";
+import AdminAlertsPage from "./pages/AdminAlertsPage";
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/*  Auth pages WITHOUT main navbar */}
+        {/* Auth pages (no main navbar) */}
         <Route
           path="/login"
           element={
@@ -44,23 +40,25 @@ export default function App() {
           }
         />
 
-        {/*  Everything else uses the normal Layout WITH navbar */}
-        <Route
-          path="/*"
-          element={
-            <Layout title="SafePath Frontend">
-              <Routes>
-                <Route path="/" element={<HomeGate />} />
-                <Route path="/map" element={<MapPage />} />
-                <Route path="/filter-reports" element={<FilterReportsPage />} />
-                <Route path="/reports" element={<ReportsPage />} />
-                <Route path="/admin" element={<AdminReportsPage />} />
-                <Route path="/qr" element={<QrPage />} />
-                <Route path="*" element={<Navigate to="/" replace />} />
-              </Routes>
-            </Layout>
-          }
-        />
+        {/* Everything else uses Layout */}
+        <Route path="/" element={<Layout title="SafePath Bangladesh" />}>
+          <Route index element={<LandingPage />} />
+
+          <Route path="map" element={<MapPage />} />
+          <Route path="reports" element={<ReportsPage />} />
+          <Route path="filter-reports" element={<FilterReportsPage />} />
+          <Route path="qr" element={<QrPage />} />
+
+          {/* Citizen alerts list page */}
+          <Route path="alerts" element={<AlertsPage />} />
+
+          {/* Admin pages */}
+          <Route path="admin" element={<AdminReportsPage />} />
+          <Route path="admin/alerts" element={<AdminAlertsPage />} />
+
+          {/* fallback */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );

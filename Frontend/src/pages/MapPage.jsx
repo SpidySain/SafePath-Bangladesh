@@ -13,8 +13,8 @@ export default function MapPage() {
       setLoading(true);
       setError("");
       try {
-        const data = await fetchReports();
-        setReports(data);
+        const data = await fetchReports({ status: "VERIFIED" });
+        setReports((data || []).filter(r => (r.status || "").toUpperCase() === "VERIFIED"));
       } catch (err) {
         setError(err.message || "Failed to load reports");
       } finally {

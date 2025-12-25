@@ -2,20 +2,22 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import bgImage from "../assets/login-hero.png";
+import "./loginFullscreen.css";
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { signIn, isLoggedIn } = useAuth(); //  include isLoggedIn
+  const { signIn, isLoggedIn } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  //  If already logged in → go to HOME
   useEffect(() => {
     if (isLoggedIn) {
-      navigate("/", { replace: true });
+      navigate("/home", { replace: true });
     }
   }, [isLoggedIn, navigate]);
 
@@ -25,7 +27,8 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await signIn({ email, password });
-      navigate("/", { replace: true });
+      //  Redirect to HOME after login
+      navigate("/home", { replace: true });
     } catch (err) {
       setError(err?.message || "Login failed");
     } finally {
@@ -34,37 +37,58 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="card" style={{ maxWidth: 520, margin: "0 auto" }}>
-      <h2 style={{ marginTop: 0 }}>Login</h2>
-      <p className="muted" style={{ marginTop: "-0.25rem" }}>
-        Sign in with your email and password.
-      </p>
+    <div
+      className="login-bg"
+      style={{ backgroundImage: `url(${bgImage})` }}
+    >
+      <div className="login-overlay" />
 
-      <form className="form" onSubmit={onSubmit}>
-        <div className="form__group">
-          <label>Email</label>
-          <input value={email} onChange={e => setEmail(e.target.value)} type="email" required />
+      <div className="login-card">
+        {/* 🚦 Traffic light accent */}
+        <div className="traffic-light" aria-hidden="true">
+          <span className="light red" />
+          <span className="light yellow" />
+          <span className="light green" />
         </div>
 
-        <div className="form__group">
-          <label>Password</label>
-          <input value={password} onChange={e => setPassword(e.target.value)} type="password" required />
-        </div>
+        <h1 className="login-title">SafePath Bangladesh</h1>
+        <p className="login-subtitle">
+          Community-driven road safety platform
+        </p>
 
-        <div className="form__actions">
+        <form onSubmit={onSubmit} className="login-form">
+          <div className="login-field">
+            <label>Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              required
+            />
+          </div>
+
+          <div className="login-field">
+            <label>Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              placeholder="••••••••"
+              required
+            />
+          </div>
+
+          {error && <div className="login-error">{error}</div>}
+
           <button type="submit" disabled={loading}>
             {loading ? "Signing in..." : "Login"}
           </button>
-          {error && (
-            <span className="pill" style={{ background: "rgba(255,0,0,0.2)", border: "1px solid rgba(255,0,0,0.3)" }}>
-              {error}
-            </span>
-          )}
-        </div>
-      </form>
+        </form>
 
-      <div className="muted" style={{ marginTop: "0.75rem" }}>
-        Don&apos;t have an account? <Link to="/register">Register</Link>
+        <div className="login-footer">
+          Don’t have an account? <Link to="/register">Register</Link>
+        </div>
       </div>
     </div>
   );

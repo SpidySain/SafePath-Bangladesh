@@ -5,8 +5,13 @@ const Location = require("../models/Location");
 const IssueCategory = require("../models/IssueCategory");
 const Rating = require("../models/Rating");
 const Vehicle = require("../models/Vehicle");
-
 const router = express.Router();
+const {
+  adminGetAlerts,
+  adminCreateAlert,
+  adminUpdateAlert,
+  adminDeleteAlert
+} = require("../controllers/alertController");
 
 // All routes here require admin
 router.use(authMiddleware, adminOnly);
@@ -289,5 +294,17 @@ router.get("/red-zones", async (req, res) => {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 });
+
+
+router.get("/alerts", adminGetAlerts);
+
+// POST /api/admin/alerts
+router.post("/alerts", adminCreateAlert);
+
+// PATCH /api/admin/alerts/:id
+router.patch("/alerts/:id", adminUpdateAlert);
+
+// DELETE /api/admin/alerts/:id
+router.delete("/alerts/:id", adminDeleteAlert);
 
 module.exports = router;

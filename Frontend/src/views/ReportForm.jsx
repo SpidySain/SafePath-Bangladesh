@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { createReportSubmission } from "../controllers/reportController";
 import locations from "../data/bdLocations.json";
 
@@ -41,6 +41,7 @@ export default function ReportForm({ categories, prefill, onSubmitSuccess }) {
   const [geoLoading, setGeoLoading] = useState(false);
   const [geoStatus, setGeoStatus] = useState("");
   const [geoError, setGeoError] = useState("");
+
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -53,8 +54,8 @@ export default function ReportForm({ categories, prefill, onSubmitSuccess }) {
 
   useEffect(() => {
     if (prefill) {
-      if (prefill.latitude) setLatitude(prefill.latitude);
-      if (prefill.longitude) setLongitude(prefill.longitude);
+      if (prefill.latitude) setLatitude(String(prefill.latitude));
+      if (prefill.longitude) setLongitude(String(prefill.longitude));
       if (prefill.city) setDistrict(prefill.city);
       if (prefill.district) setDistrict(prefill.district);
       if (prefill.upazila) setUpazila(prefill.upazila);
@@ -81,6 +82,7 @@ export default function ReportForm({ categories, prefill, onSubmitSuccess }) {
           metadataText: formatMetadata(prefill.vehicle.metadata)
         });
       }
+
       setIssueHistory(prefill.issueHistory || []);
     }
   }, [prefill]);
@@ -90,29 +92,58 @@ export default function ReportForm({ categories, prefill, onSubmitSuccess }) {
     setFile(f || null);
   };
 
-  const handleUseGps = () => {
-    setGeoStatus("");
-    setGeoError("");
-    if (!navigator.geolocation) {
-      setGeoError("Geolocation is not supported in this browser.");
-      return;
+  // ✅ Better GPS helper (used by button + auto-run)
+  const requestGps = useCallback(
+    ({ overwrite = false } = {}) => {
+      setGeoStatus("");
+      setGeoError("");
+
+      if (!navigator.geolocation) {
+        setGeoError("Geolocation is not supported in this browser.");
+        return;
+      }
+
+      // if already filled and we don't want to overwrite, skip
+      if (!overwrite && latitude && longitude) return;
+
+      setGeoLoading(true);
+
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          const { latitude: lat, longitude: lng, accuracy } = pos.coords;
+          setLatitude(String(Number(lat).toFixed(6)));
+          setLongitude(String(Number(lng).toFixed(6)));
+          setGeoStatus(`Location locked (±${Math.round(accuracy)} m)`);
+          setGeoLoading(false);
+        },
+        err => {
+          const msg =
+            err?.code === 1
+              ? "GPS permission denied. Allow location access in the browser and try again."
+              : err?.code === 2
+              ? "GPS position unavailable. Turn on device location and try again."
+              : "GPS timeout. Try again (or move closer to a window/outside).";
+          setGeoError(msg);
+          setGeoLoading(false);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 20000, // ✅ longer timeout
+          maximumAge: 15000 // ✅ allows using recent cached location
+        }
+      );
+    },
+    [latitude, longitude]
+  );
+
+  // ✅ Auto-run GPS once when page loads (only if no QR already filled it)
+  useEffect(() => {
+    const hasPrefilled = Boolean(prefill?.latitude && prefill?.longitude) || Boolean(busStopDetails);
+    if (!hasPrefilled && (!latitude || !longitude)) {
+      requestGps({ overwrite: false });
     }
-    setGeoLoading(true);
-    navigator.geolocation.getCurrentPosition(
-      pos => {
-        const { latitude: lat, longitude: lng, accuracy } = pos.coords;
-        setLatitude(lat.toFixed(6));
-        setLongitude(lng.toFixed(6));
-        setGeoStatus(`Location locked (±${Math.round(accuracy)} m)`);
-        setGeoLoading(false);
-      },
-      err => {
-        setGeoError(err.message || "Unable to fetch GPS location.");
-        setGeoLoading(false);
-      },
-      { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
-    );
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const resetForm = () => {
     setDescription("");
@@ -125,7 +156,7 @@ export default function ReportForm({ categories, prefill, onSubmitSuccess }) {
     if (!vehicleDetails.metadataText.trim()) return undefined;
     try {
       return JSON.parse(vehicleDetails.metadataText);
-    } catch (err) {
+    } catch {
       throw new Error("Metadata must be valid JSON (or leave empty).");
     }
   };
@@ -160,10 +191,10 @@ export default function ReportForm({ categories, prefill, onSubmitSuccess }) {
     setSubmitting(true);
     setMessage("");
     setError("");
+
     try {
-      if (!vehicleDetails.id && !busStopDetails) {
-        throw new Error("Scan a vehicle QR or a bus-stop QR (location-only) before submitting.");
-      }
+      // ✅ QR is OPTIONAL now (removed blocking condition)
+
       if (!reporterId || !issueCategoryId || !latitude || !longitude || !district) {
         throw new Error("Please fill reporter, location (district/lat/lng), and issue type.");
       }
@@ -172,20 +203,23 @@ export default function ReportForm({ categories, prefill, onSubmitSuccess }) {
 
       await createReportSubmission({
         reporterId,
-        vehicleId: vehicleDetails.id || undefined,
-        busStopCode: busStopDetails?.code,
+        vehicleId: vehicleDetails.id || undefined, // ✅ optional
+        busStopCode: busStopDetails?.code, // optional
         busStopName: busStopDetails?.name,
         busStopRaw: busStopDetails?.raw,
+
         latitude: parseFloat(latitude),
         longitude: parseFloat(longitude),
         city: district,
         district,
         upazila,
         address,
+
         issueCategoryId,
         severity: Number(severity),
         description,
         file,
+
         allowVehicleEdit,
         vehicleUpdates
       });
@@ -207,6 +241,7 @@ export default function ReportForm({ categories, prefill, onSubmitSuccess }) {
           <div className="pill">QR prefill applied{prefill.source ? ` (${prefill.source})` : ""}</div>
         </div>
       )}
+
       {busStopDetails && (
         <div className="form__group">
           <div className="pill">
@@ -253,15 +288,16 @@ export default function ReportForm({ categories, prefill, onSubmitSuccess }) {
       </div>
 
       <div className="form__group">
-        <label>Vehicle (from QR)</label>
+        <label>Vehicle (from QR) — Optional</label>
         <div className="pill" style={{ marginBottom: "0.5rem" }}>
-          {vehicleDetails.qrCode ? `QR: ${vehicleDetails.qrCode}` : "No vehicle loaded"}
+          {vehicleDetails.qrCode ? `QR: ${vehicleDetails.qrCode}` : "No vehicle loaded (you can still submit)"}
         </div>
         <label className="muted" style={{ display: "block" }}>
           {vehicleDetails.id
             ? "Vehicle loaded. You can submit a report or enable editing to correct details."
-            : "Scan a vehicle QR to load vehicle data and history."}
+            : "Scan a vehicle QR to auto-fill vehicle info (optional)."}
         </label>
+
         <div className="form__group--split">
           <div>
             <label>Model</label>
@@ -286,6 +322,7 @@ export default function ReportForm({ categories, prefill, onSubmitSuccess }) {
               placeholder="Government / Private / Ride-share"
             />
           </div>
+
           <div>
             <label>Registration Number</label>
             <input
@@ -317,6 +354,7 @@ export default function ReportForm({ categories, prefill, onSubmitSuccess }) {
             />
           </div>
         </div>
+
         <label style={{ marginTop: "0.6rem" }}>Metadata (JSON)</label>
         <textarea
           rows="3"
@@ -325,6 +363,7 @@ export default function ReportForm({ categories, prefill, onSubmitSuccess }) {
           disabled={!allowVehicleEdit}
           placeholder='{ "color": "blue", "fleet": "north" }'
         />
+
         <label style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
           <input
             type="checkbox"
@@ -366,12 +405,13 @@ export default function ReportForm({ categories, prefill, onSubmitSuccess }) {
         <div>
           <label>Latitude / Longitude</label>
           <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.5rem", flexWrap: "wrap" }}>
-            <button type="button" onClick={handleUseGps} disabled={geoLoading}>
+            <button type="button" onClick={() => requestGps({ overwrite: true })} disabled={geoLoading}>
               {geoLoading ? "Locking GPS..." : "Use GPS"}
             </button>
             {geoStatus && <span className="pill">{geoStatus}</span>}
             {geoError && <span className="pill pill--error">{geoError}</span>}
           </div>
+
           <div className="form__split-row">
             <input
               value={latitude}
@@ -387,6 +427,7 @@ export default function ReportForm({ categories, prefill, onSubmitSuccess }) {
             />
           </div>
         </div>
+
         <div>
           <label>District</label>
           <select value={district} onChange={e => setDistrict(e.target.value)} required>
@@ -397,12 +438,9 @@ export default function ReportForm({ categories, prefill, onSubmitSuccess }) {
               </option>
             ))}
           </select>
+
           <label>Upazila</label>
-          <select
-            value={upazila}
-            onChange={e => setUpazila(e.target.value)}
-            disabled={!district}
-          >
+          <select value={upazila} onChange={e => setUpazila(e.target.value)} disabled={!district}>
             <option value="">{district ? "Select upazila" : "Choose district first"}</option>
             {locations
               .find(loc => loc.district === district)
@@ -412,6 +450,7 @@ export default function ReportForm({ categories, prefill, onSubmitSuccess }) {
                 </option>
               ))}
           </select>
+
           <label>Address (optional)</label>
           <input value={address} onChange={e => setAddress(e.target.value)} placeholder="Bus stop or road name" />
         </div>
@@ -428,7 +467,14 @@ export default function ReportForm({ categories, prefill, onSubmitSuccess }) {
           {submitting ? "Submitting..." : "Submit Report"}
         </button>
         {message && <span className="pill">{message}</span>}
-        {error && <span className="pill" style={{ background: "rgba(255,0,0,0.2)", border: "1px solid rgba(255,0,0,0.3)" }}>{error}</span>}
+        {error && (
+          <span
+            className="pill"
+            style={{ background: "rgba(255,0,0,0.2)", border: "1px solid rgba(255,0,0,0.3)" }}
+          >
+            {error}
+          </span>
+        )}
       </div>
     </form>
   );

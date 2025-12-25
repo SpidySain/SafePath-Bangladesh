@@ -34,20 +34,16 @@ export const SEVERITY_LEVELS = [
 
 export function buildReportQuery(filters = {}) {
   const params = new URLSearchParams();
-  const district = filters.district?.trim();
-  const upazila = filters.upazila?.trim();
-  const categoryId = filters.categoryId;
-  const severityLevel = filters.severityLevel;
-  const status = filters.status;
 
-  if (district) params.set("district", district);
-  if (upazila) params.set("upazila", upazila);
-  if (categoryId) params.set("categoryId", categoryId);
-  if (severityLevel && severityLevel !== "ALL") params.set("severityLevel", severityLevel);
-  if (status) params.set("status", status);
+  if (filters.status) params.set("status", filters.status);
+  if (filters.city) params.set("city", filters.city);
+  if (filters.district) params.set("district", filters.district);
+  if (filters.upazila) params.set("upazila", filters.upazila);
+  if (filters.categoryId) params.set("categoryId", filters.categoryId);
+  if (filters.severity !== "" && filters.severity !== undefined) params.set("severity", filters.severity);
 
-  const queryString = params.toString();
-  return queryString ? `?${queryString}` : "";
+  const q = params.toString();
+  return q ? `?${q}` : "";
 }
 
 export function getSeverityMeta(value = "ALL") {

@@ -43,6 +43,10 @@ app.use("/api/reports", reportRoutes);
 const adminRoutes = require("./routes/adminRoutes");
 app.use("/api/admin", adminRoutes);
 
+const alertRoutes = require("./routes/alertRoutes");
+app.use("/api/alerts", alertRoutes);
+
+
 // SPA fallback: route unrecognized paths to index.html so client-side routing works
 // SPA fallback: if request seems to accept HTML and is not an API route
 app.use((req, res, next) => {
@@ -52,7 +56,8 @@ app.use((req, res, next) => {
   if (req.path.startsWith('/api/') || req.path.startsWith('/uploads')) return next();
   // if request looks like it wants a static asset (has a dot), skip
   if (req.path.includes('.')) return next();
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, "..", "Frontend", "index.html"));
+
 });
 
 // ensure required env is present

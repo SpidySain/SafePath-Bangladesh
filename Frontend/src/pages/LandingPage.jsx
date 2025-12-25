@@ -1,9 +1,16 @@
 // src/pages/LandingPage.jsx
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import mapBg from "../assets/feature-bg/map.png";
+import reportBg from "../assets/feature-bg/report.png";
+import historyBg from "../assets/feature-bg/history.png";
+import qrBg from "../assets/feature-bg/qr.png";
+import adminBg from "../assets/feature-bg/admin.png";
+import alertsBg from "../assets/feature-bg/alerts.png";
+import "./landing.css";
 
 export default function LandingPage() {
-  const { user, isLoggedIn, isAdmin } = useAuth();
+  const { user, isLoggedIn, isAdmin, signOut } = useAuth();
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
@@ -14,7 +21,7 @@ export default function LandingPage() {
           overflow: "hidden",
           position: "relative",
           padding: "1.4rem",
-          borderRadius: 18
+          borderRadius: 18      
         }}
       >
         <div
@@ -23,7 +30,7 @@ export default function LandingPage() {
             position: "absolute",
             inset: 0,
             background:
-              "radial-gradient(1200px 600px at 10% 20%, rgba(0, 255, 255, 0.20), transparent 55%), radial-gradient(900px 500px at 90% 10%, rgba(150, 100, 255, 0.18), transparent 55%)",
+              "radial-gradient(1200px 600px at 10% 20%, rgba(56, 189, 248, 0.28), transparent 55%), radial-gradient(900px 500px at 90% 10%, rgba(34, 197, 94, 0.24), transparent 55%)",
             pointerEvents: "none"
           }}
         />
@@ -46,39 +53,48 @@ export default function LandingPage() {
           </p>
 
           <div style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem", marginTop: "0.25rem" }}>
-            <Link to="/map">
-              <button type="button">Open Safety Map</button>
-            </Link>
-
-            <Link to="/reports">
-              <button type="button" className="btn-secondary">
-                View Reports
-              </button>
-            </Link>
-
-            <Link to="/filter-reports">
-              <button type="button" className="btn-secondary">
-                Filter Reports
-              </button>
-            </Link>
-
-            <Link to="/qr">
-              <button type="button" className="btn-secondary">
-                QR & Ratings
-              </button>
-            </Link>
-
             {!isLoggedIn ? (
               <Link to="/login" style={{ marginLeft: "auto" }}>
-                <button type="button" className="btn-secondary">
-                  Login to Continue
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  style={{
+                    padding: "0.6rem 1.1rem",
+                    fontWeight: 700,
+                    borderRadius: 999,
+                  }}
+                >
+                  Login
                 </button>
               </Link>
             ) : (
-              <div className="pill" style={{ marginLeft: "auto" }}>
-                Logged in as <b style={{ marginLeft: 6 }}>{user?.name || "User"}</b>
-                {isAdmin ? <span style={{ marginLeft: 8, opacity: 0.8 }}>(ADMIN)</span> : null}
-              </div>
+                <div
+                  style={{
+                    marginLeft: "auto",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.6rem"
+                  }}
+                >
+                  <div className="pill">
+                    Logged in as <b style={{ marginLeft: 6 }}>{user?.name || "User"}</b>
+                    {isAdmin ? <span style={{ marginLeft: 8, opacity: 0.8 }}>(ADMIN)</span> : null}
+                  </div>
+                  <Link to="/login" style={{ marginLeft: "auto" }}>
+                    <button
+                      type="button"
+                      className="btn-secondary"
+                      onClick={signOut}
+                      style={{
+                        padding: "0.6rem 1.1rem",
+                        fontWeight: 700,
+                        borderRadius: 999
+                      }}
+                    >
+                      Logout
+                    </button>
+                  </Link>
+                </div>
             )}
           </div>
         </div>
@@ -93,25 +109,55 @@ export default function LandingPage() {
       </section>
 
       {/* FEATURES */}
-      <section style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: "0.9rem" }}>
+      <section className="features-grid">
+        
         <FeatureCard
           title="Interactive Safety Map"
           desc="See unsafe areas instantly with color-coded zones and markers based on severity and verification."
           to="/map"
           cta="Explore Map"
+          bg={mapBg}
         />
         <FeatureCard
-          title="Report & Verify"
+          title="Report"
           desc="Submit road safety issues and let admins verify reports to keep information trustworthy."
           to="/reports"
-          cta="Browse Reports"
+          cta="Create Reports"
+          bg={reportBg}
+        />
+        <FeatureCard
+          title="Report History "
+          desc="See other reports"
+          to="/filter-reports"
+          cta="Open report history"
+          bg={historyBg}
+
         />
         <FeatureCard
           title="QR Transport Profiles"
           desc="Scan QR to view a driver's community rating, report history, and related safety incidents."
           to="/qr"
           cta="Open QR"
+          bg={qrBg}
         />
+        {isLoggedIn && isAdmin && (
+          <>
+            <FeatureCard
+              title="Admin Panel"
+              desc="Verify reports, manage statuses, and monitor analytics."
+              to="/admin"
+              cta="Open Admin"
+              bg={adminBg}
+            />
+            <FeatureCard
+              title="Alerts Dashboard"
+              desc="Create and manage safety alerts shown to users."
+              to="/admin/alerts"
+              cta="Manage Alerts"
+              bg={alertsBg}
+            />
+          </>
+        )}
       </section>
 
       {/* HOW IT WORKS */}
@@ -126,46 +172,6 @@ export default function LandingPage() {
           <Step n="2" title="Review" desc="Reports appear in lists and on the map instantly." />
           <Step n="3" title="Verify" desc="Admins verify to reduce misinformation." />
           <Step n="4" title="Act" desc="Use data to plan safer routes and raise awareness." />
-        </div>
-      </section>
-
-      {/* QUICK LINKS */}
-      <section className="card" style={{ padding: "1.25rem", borderRadius: 18 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", gap: "1rem", flexWrap: "wrap" }}>
-          <div>
-            <h3 style={{ marginTop: 0, marginBottom: "0.25rem" }}>Quick actions</h3>
-            <p className="muted" style={{ marginTop: 0 }}>
-              Jump directly into the most used parts of the platform.
-            </p>
-          </div>
-
-          <div style={{ display: "flex", gap: "0.6rem", flexWrap: "wrap", alignItems: "center" }}>
-            <Link to="/map">
-              <button type="button">Map</button>
-            </Link>
-            <Link to="/filter-reports">
-              <button type="button" className="btn-secondary">
-                Filters
-              </button>
-            </Link>
-            <Link to="/reports">
-              <button type="button" className="btn-secondary">
-                Reports
-              </button>
-            </Link>
-            <Link to="/qr">
-              <button type="button" className="btn-secondary">
-                QR
-              </button>
-            </Link>
-            {isAdmin ? (
-              <Link to="/admin">
-                <button type="button" className="btn-secondary">
-                  Admin
-                </button>
-              </Link>
-            ) : null}
-          </div>
         </div>
       </section>
     </div>
@@ -186,17 +192,62 @@ function StatCard({ title, value, desc }) {
   );
 }
 
-function FeatureCard({ title, desc, to, cta }) {
+function FeatureCard({ title, desc, to, cta, bg }) {
   return (
-    <div className="card" style={{ padding: "1.1rem", borderRadius: 18, display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-      <div>
+    <div
+      className="featureCard card"
+      style={{
+        padding: "1.13rem",
+        borderRadius: 18,
+        display: "flex",
+        flexDirection: "column",
+        gap: "0.75rem",
+        position: "relative",
+        overflow: "hidden"
+      }}
+    >
+      {/* background image */}
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          inset: 0,
+          backgroundImage: `url(${bg})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          opacity: 0.9,
+          filter: "brightness(1) saturate(1.5) contrast(0.98)"
+        }}
+      />
+
+      {/* dark overlay for readability */}
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "linear-gradient(135deg, rgba(15,23,42,0.55), rgba(15,23,42,0.35))"
+        }}
+      />
+
+      {/* content stays on top */}
+      <div style={{ position: "relative" }}>
         <div style={{ fontWeight: 900, fontSize: "1.05rem" }}>{title}</div>
         <div className="muted" style={{ marginTop: "0.35rem", lineHeight: 1.6 }}>
           {desc}
         </div>
       </div>
 
-      <div style={{ marginTop: "auto", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div
+        style={{
+          position: "relative",
+          marginTop: "auto",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center"
+        }}
+      >
         <span className="pill">SafePath</span>
         <Link to={to}>
           <button type="button" className="btn-secondary">
@@ -208,9 +259,17 @@ function FeatureCard({ title, desc, to, cta }) {
   );
 }
 
+
 function Step({ n, title, desc }) {
   return (
-    <div style={{ border: "1px solid var(--stroke)", borderRadius: 16, padding: "0.9rem", background: "rgba(255,255,255,0.02)" }}>
+    <div
+      style={{
+        border: "1px solid var(--stroke)",
+        borderRadius: 16,
+        padding: "0.9rem",
+        background: "rgba(255,255,255,0.02)"
+      }}
+    >
       <div className="pill" style={{ width: "fit-content" }}>
         Step {n}
       </div>
