@@ -17,6 +17,7 @@ import RegisterPage from "./pages/RegisterPage";
 
 import AlertsPage from "./pages/AlertsPage";
 import AdminAlertsPage from "./pages/AdminAlertsPage";
+import AdminAwarenessPage from "./pages/AdminAwarenessPage"; // ✅ NEW
 
 export default function App() {
   return (
@@ -55,6 +56,7 @@ export default function App() {
           {/* Admin pages */}
           <Route path="admin" element={<AdminReportsPage />} />
           <Route path="admin/alerts" element={<AdminAlertsPage />} />
+          <Route path="admin/awareness" element={<AdminAwarenessPage />} /> {/* ✅ NEW */}
 
           {/* fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />

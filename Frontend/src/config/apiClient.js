@@ -47,3 +47,11 @@ export async function apiUpload(path, formData) {
   if (!res.ok) throw new Error(`UPLOAD ${path} failed with ${res.status}`);
   return res.json();
 }
+export async function apiDelete(path) {
+  const res = await fetch(`${API_BASE_URL}${path}`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json", ...authHeaders() }
+  });
+  if (!res.ok) throw new Error(`DELETE ${path} failed with ${res.status}`);
+  return res.json();
+}

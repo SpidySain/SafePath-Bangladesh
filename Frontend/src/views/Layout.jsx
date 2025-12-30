@@ -3,6 +3,7 @@ import "./layout.css";
 import { Link, useLocation, useNavigate, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import AlertsBanner from "../views/AlertsBanner";
+import AwarenessBanner from "../views/AwarenessBanner"; // ✅ NEW
 
 export default function Layout({ title }) {
   const location = useLocation();
@@ -64,6 +65,13 @@ export default function Layout({ title }) {
                   >
                     Alerts
                   </Link>
+
+                  <Link
+                    to="/admin/awareness"
+                    className={path === "/admin/awareness" ? "nav__link nav__link--active" : "nav__link"}
+                  >
+                    Awareness
+                  </Link>
                 </>
               )}
 
@@ -92,9 +100,10 @@ export default function Layout({ title }) {
         </header>
       )}
 
-      {/*  Show banner for BOTH normal users + admins (everywhere) */}
+      {/*  Show banners for BOTH normal users + admins (everywhere) */}
       <main className="layout__body">
         <AlertsBanner />
+        <AwarenessBanner />
         <Outlet />
       </main>
     </div>

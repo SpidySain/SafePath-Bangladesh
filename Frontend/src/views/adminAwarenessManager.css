@@ -1,0 +1,351 @@
+/* Admin Awareness Manager Styles */
+
+.awareness-manager {
+  background: white;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.awareness-manager__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 16px;
+}
+
+.awareness-manager__header h2 {
+  margin: 0;
+  font-size: 24px;
+  color: #333;
+}
+
+.awareness-manager__btn-add {
+  background: #4caf50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.awareness-manager__btn-add:hover {
+  background: #45a049;
+}
+
+.awareness-manager__error {
+  background: #ffebee;
+  color: #c62828;
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  border-left: 4px solid #c62828;
+}
+
+.awareness-manager__loading,
+.awareness-manager__empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+  font-size: 16px;
+}
+
+/* Awareness Form */
+
+.awareness-form {
+  background: #f9f9f9;
+  border: 1px solid #e0e0e0;
+  padding: 24px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+
+.awareness-form__group {
+  margin-bottom: 16px;
+}
+
+.awareness-form__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.awareness-form__group label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 6px;
+}
+
+.awareness-form__group input,
+.awareness-form__group textarea,
+.awareness-form__group select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.awareness-form__group input:focus,
+.awareness-form__group textarea:focus,
+.awareness-form__group select:focus {
+  outline: none;
+  border-color: #4caf50;
+  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.1);
+}
+
+.awareness-form__actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #ddd;
+}
+
+.awareness-form__btn-submit {
+  background: #4caf50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.awareness-form__btn-submit:hover {
+  background: #45a049;
+}
+
+.awareness-form__btn-cancel {
+  background: #f0f0f0;
+  color: #333;
+  border: 1px solid #ddd;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.awareness-form__btn-cancel:hover {
+  background: #e0e0e0;
+}
+
+/* Awareness Messages List */
+
+.awareness-messages {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 16px;
+}
+
+.awareness-msg {
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+}
+
+.awareness-msg:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: #ccc;
+}
+
+.awareness-msg--high {
+  border-left: 5px solid #f74a3c;
+  background: #fff5f5;
+}
+
+.awareness-msg--medium {
+  border-left: 5px solid #ffa500;
+  background: #fffbf0;
+}
+
+.awareness-msg--low {
+  border-left: 5px solid #4caf50;
+  background: #f1f8f4;
+}
+
+.awareness-msg--inactive {
+  opacity: 0.6;
+  background: #f5f5f5;
+}
+
+.awareness-msg__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.awareness-msg__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  flex: 1;
+}
+
+.awareness-msg__badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.awareness-msg__badge--high {
+  background: #f74a3c;
+  color: white;
+}
+
+.awareness-msg__badge--medium {
+  background: #ffa500;
+  color: white;
+}
+
+.awareness-msg__badge--low {
+  background: #4caf50;
+  color: white;
+}
+
+.awareness-msg__content {
+  flex: 1;
+  margin-bottom: 12px;
+}
+
+.awareness-msg__text {
+  margin: 8px 0;
+  font-size: 14px;
+  color: #555;
+  line-height: 1.5;
+}
+
+.awareness-msg__description {
+  margin: 8px 0;
+  font-size: 13px;
+  color: #777;
+  font-style: italic;
+  line-height: 1.4;
+}
+
+.awareness-msg__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 12px;
+  color: #999;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #eee;
+}
+
+.awareness-msg__category {
+  background: #f0f0f0;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.awareness-msg__expires,
+.awareness-msg__created {
+  flex: 1;
+  min-width: 120px;
+}
+
+.awareness-msg__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.awareness-msg__btn {
+  flex: 1;
+  min-width: 80px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.awareness-msg__btn--toggle {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.awareness-msg__btn--toggle:hover {
+  background: #bbdefb;
+}
+
+.awareness-msg__btn--toggle-off {
+  background: #f3e5f5;
+  color: #7b1fa2;
+}
+
+.awareness-msg__btn--toggle-off:hover {
+  background: #e1bee7;
+}
+
+.awareness-msg__btn--edit {
+  background: #fff3e0;
+  color: #e65100;
+}
+
+.awareness-msg__btn--edit:hover {
+  background: #ffe0b2;
+}
+
+.awareness-msg__btn--delete {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.awareness-msg__btn--delete:hover {
+  background: #ffcdd2;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .awareness-manager__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .awareness-form__row {
+    grid-template-columns: 1fr;
+  }
+
+  .awareness-messages {
+    grid-template-columns: 1fr;
+  }
+
+  .awareness-msg__actions {
+    gap: 4px;
+  }
+
+  .awareness-msg__btn {
+    min-width: 60px;
+    font-size: 11px;
+  }
+}
