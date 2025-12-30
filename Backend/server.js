@@ -46,6 +46,8 @@ app.use("/api/admin", adminRoutes);
 const alertRoutes = require("./routes/alertRoutes");
 app.use("/api/alerts", alertRoutes);
 
+const awarenessRoutes = require("./routes/awarenessRoutes");
+app.use("/api/awareness", awarenessRoutes);
 
 // SPA fallback: route unrecognized paths to index.html so client-side routing works
 // SPA fallback: if request seems to accept HTML and is not an API route
