@@ -7,6 +7,8 @@ import historyBg from "../assets/feature-bg/history.png";
 import qrBg from "../assets/feature-bg/qr.png";
 import adminBg from "../assets/feature-bg/admin.png";
 import alertsBg from "../assets/feature-bg/alerts.png";
+import awarenessBg from "../assets/feature-bg/awareness.png";
+import createAwarenessBg from "../assets/feature-bg/createAwareness.png";
 import "./landing.css";
 
 import { useEffect, useState } from "react";
@@ -197,6 +199,13 @@ export default function LandingPage() {
           cta="Open QR"
           bg={qrBg}
         />
+        <FeatureCard
+          title="Awareness Updates"
+          desc="Read road safety tips and awareness updates published by admins."
+          to="/awareness"
+          cta="View Awareness"
+          bg={awarenessBg}
+        />
         {isLoggedIn && isAdmin && (
           <>
             <FeatureCard
@@ -212,6 +221,13 @@ export default function LandingPage() {
               to="/admin/alerts"
               cta="Manage Alerts"
               bg={alertsBg}
+            />
+           <FeatureCard
+              title="Create Awareness message"
+              desc="Create and manage safety awareness shown to users."
+              to="admin/awareness"
+              cta="Manage awareness"
+              bg={createAwarenessBg}
             />
           </>
         )}

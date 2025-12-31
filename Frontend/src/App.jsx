@@ -18,7 +18,7 @@ import RegisterPage from "./pages/RegisterPage";
 import AlertsPage from "./pages/AlertsPage";
 import AdminAlertsPage from "./pages/AdminAlertsPage";
 import AdminAwarenessPage from "./pages/AdminAwarenessPage"; 
-
+import AwarenessPage from "./pages/AwarenessPage";
 import FeedbacksPage from "./pages/FeedbacksPage";
 
 export default function App() {
@@ -51,14 +51,14 @@ export default function App() {
           <Route path="reports" element={<ReportsPage />} />
           <Route path="filter-reports" element={<FilterReportsPage />} />
           <Route path="qr" element={<QrPage />} />
-
+          <Route path="/awareness" element={<AwarenessPage />} />
           {/* Citizen alerts list page */}
           <Route path="alerts" element={<AlertsPage />} />
 
           {/* Admin pages */}
           <Route path="admin" element={<AdminReportsPage />} />
           <Route path="admin/alerts" element={<AdminAlertsPage />} />
-          <Route path="admin/awareness" element={<AdminAwarenessPage />} /> 
+          <Route path="admin/awareness" element={<AdminAwarenessPage />} />          
 
           <Route path="/feedbacks" element={<FeedbacksPage />} />
 

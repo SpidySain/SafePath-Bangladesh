@@ -3,7 +3,7 @@ import "./layout.css";
 import { Link, useLocation, useNavigate, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import AlertsBanner from "../views/AlertsBanner";
-import AwarenessBanner from "../views/AwarenessBanner"; // ✅ NEW
+import AwarenessBanner from "../views/AwarenessBanner";
 
 export default function Layout({ title }) {
   const location = useLocation();
@@ -33,39 +33,31 @@ export default function Layout({ title }) {
               <Link to="/map" className={path === "/map" ? "nav__link nav__link--active" : "nav__link"}>
                 Map
               </Link>
-
-              <Link
-                to="/reports"
-                className={path === "/reports" ? "nav__link nav__link--active" : "nav__link"}
-              >
+              <Link to="/reports" className={path === "/reports" ? "nav__link nav__link--active" : "nav__link"}>
                 Reports
               </Link>
-
               <Link
                 to="/filter-reports"
                 className={path === "/filter-reports" ? "nav__link nav__link--active" : "nav__link"}
               >
                 History
               </Link>
-
               <Link to="/qr" className={path === "/qr" ? "nav__link nav__link--active" : "nav__link"}>
                 QR
               </Link>
 
-              {/* show both Admin + Alerts when admin */}
+              {/* Admin links */}
               {isLoggedIn && isAdmin && (
                 <>
                   <Link to="/admin" className={path === "/admin" ? "nav__link nav__link--active" : "nav__link"}>
                     Admin
                   </Link>
-
                   <Link
                     to="/admin/alerts"
                     className={path === "/admin/alerts" ? "nav__link nav__link--active" : "nav__link"}
                   >
                     Alerts
                   </Link>
-
                   <Link
                     to="/admin/awareness"
                     className={path === "/admin/awareness" ? "nav__link nav__link--active" : "nav__link"}
@@ -100,10 +92,13 @@ export default function Layout({ title }) {
         </header>
       )}
 
-      {/*  Show banners for BOTH normal users + admins (everywhere) */}
       <main className="layout__body">
+        {/* Alerts can show everywhere if you want */}
         <AlertsBanner />
-        <AwarenessBanner />
+
+        {/*  Awareness banner everywhere EXCEPT homepage */}
+        {!isHome && <AwarenessBanner />}
+
         <Outlet />
       </main>
     </div>
