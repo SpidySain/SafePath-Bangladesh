@@ -1,5 +1,5 @@
 // src/pages/LandingPage.jsx
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import mapBg from "../assets/feature-bg/map.png";
 import reportBg from "../assets/feature-bg/report.png";
@@ -9,8 +9,62 @@ import adminBg from "../assets/feature-bg/admin.png";
 import alertsBg from "../assets/feature-bg/alerts.png";
 import "./landing.css";
 
+import { useEffect, useState } from "react";
+import { createFeedback, fetchFeedbacks, deleteFeedback } from "../controllers/feedbackController";
+
 export default function LandingPage() {
   const { user, isLoggedIn, isAdmin, signOut } = useAuth();
+
+  const navigate = useNavigate();
+
+  const [feedbacks, setFeedbacks] = useState([]);
+  const [fbOpen, setFbOpen] = useState(false);
+  const [fbMessage, setFbMessage] = useState("");
+  const [fbRating, setFbRating] = useState(5);
+  const [fbError, setFbError] = useState("");
+  const [fbLoading, setFbLoading] = useState(false);
+
+  const loadLatestFeedbacks = async () => {
+    try {
+      const data = await fetchFeedbacks({ limit: 3 });
+      setFeedbacks(Array.isArray(data) ? data : []);
+    } catch {
+      setFeedbacks([]);
+    }
+  };
+
+  useEffect(() => {
+    loadLatestFeedbacks();
+  }, []);
+
+  const handleSubmitFeedback = async () => {
+    try {
+      setFbLoading(true);
+      setFbError("");
+
+      if (!isLoggedIn) {
+        setFbError("Please login to submit feedback.");
+        return;
+      }
+
+      if (!fbMessage.trim()) {
+        setFbError("Please write a feedback message.");
+        return;
+      }
+
+      await createFeedback({ rating: fbRating, message: fbMessage });
+
+      setFbMessage("");
+      setFbRating(5);
+      setFbOpen(false);
+
+      await loadLatestFeedbacks();
+    } catch (e) {
+      setFbError(e.message || "Failed to submit feedback");
+    } finally {
+      setFbLoading(false);
+    }
+  };
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
@@ -84,7 +138,10 @@ export default function LandingPage() {
                     <button
                       type="button"
                       className="btn-secondary"
-                      onClick={signOut}
+                        onClick={() => {
+                          signOut();
+                          navigate("/login");
+                        }}
                       style={{
                         padding: "0.6rem 1.1rem",
                         fontWeight: 700,
@@ -174,6 +231,146 @@ export default function LandingPage() {
           <Step n="4" title="Act" desc="Use data to plan safer routes and raise awareness." />
         </div>
       </section>
+
+      {/* FEEDBACK SECTION */}
+      <section className="card" style={{ padding: "1.25rem", borderRadius: 18 }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            gap: 12,
+            flexWrap: "wrap",
+            alignItems: "center"
+          }}
+        >
+          <div>
+            <h3 style={{ marginTop: 0, marginBottom: 6 }}>Feedback</h3>
+            <p className="muted" style={{ marginTop: 0 }}>
+              Share your experience about usability and road safety effectiveness.
+            </p>
+          </div>
+
+          <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+            <button type="button" className="btn-secondary" onClick={() => setFbOpen(true)}>
+              Feedback
+            </button>
+
+            <button type="button" className="btn-secondary" onClick={() => navigate("/feedbacks")}>
+              See more feedbacks
+            </button>
+          </div>
+        </div>
+
+        <div className="feedbackGrid">
+
+           
+          {feedbacks.length === 0 ? (
+            <p className="muted">No feedback yet.</p>
+          ) : (
+          feedbacks.map(f => (
+            <div
+              key={f._id}
+              style={{
+                border: "1px solid var(--stroke)",
+                borderRadius: 16,
+                padding: "0.9rem",
+                position: "relative"
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
+                <div style={{ fontWeight: 900 }}>{f.userName || "User"}</div>
+                <Stars value={f.rating} />
+              </div>
+
+              <div className="muted" style={{ marginTop: 8, lineHeight: 1.6 }}>
+                {f.message}
+              </div>
+            </div>
+          ))
+
+          )}
+        </div>
+
+        {/* MODAL */}
+        {fbOpen && (
+          <div
+            onClick={() => setFbOpen(false)}
+            style={{
+              position: "fixed",
+              inset: 0,
+              background: "rgba(0,0,0,0.55)",
+              display: "grid",
+              placeItems: "center",
+              zIndex: 9999,
+              padding: 16
+            }}
+          >
+            <div
+              onClick={e => e.stopPropagation()}
+              className="card"
+              style={{
+                width: "min(720px, 100%)",
+                borderRadius: 18,
+                padding: "1.1rem",
+                background: "rgba(255,255,255,0.94)",
+                color: "#0b1220",
+                border: "1px solid rgba(0,0,0,0.08)",
+                boxShadow: "0 20px 60px rgba(0,0,0,0.35)"
+              }}
+
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center" }}>
+                <h3 style={{ margin: 0 }}>Submit Feedback</h3>
+                <button type="button" className="btn-secondary" onClick={() => setFbOpen(false)}>
+                  Close
+                </button>
+              </div>
+
+              <div style={{ marginTop: 14 }}>
+                <div className="muted" style={{ marginBottom: 8 }}>
+                  Rating
+                </div>
+                <StarPicker value={fbRating} onChange={setFbRating} />
+              </div>
+
+              <div style={{ marginTop: 5}}>
+                <div className="muted" style={{ marginBottom: 8 }}>
+                  Message
+                </div>
+                <textarea
+                  value={fbMessage}
+                  onChange={e => setFbMessage(e.target.value)}
+                  placeholder="Write your feedback..."
+                  style={{
+                    width: "95%",
+                    minHeight: 110,
+                    borderRadius: 13,
+                    padding: 12,
+                    border: "1px solid rgba(0,0,0,0.12)",
+                    background: "#ffffffff",
+                    color: "#0b1220",
+                    resize: "vertical",
+                    outline: "none"
+                  }}
+                />
+              </div>
+
+              {fbError && (
+                <div className="pill pill--error" style={{ marginTop: 12 }}>
+                  {fbError}
+                </div>
+              )}
+
+              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 14 }}>
+                <button type="button" onClick={handleSubmitFeedback} disabled={fbLoading}>
+                  {fbLoading ? "Submitting..." : "Submit"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </section>
+
     </div>
   );
 }
@@ -277,6 +474,53 @@ function Step({ n, title, desc }) {
       <div className="muted" style={{ marginTop: "0.25rem", lineHeight: 1.55 }}>
         {desc}
       </div>
+    </div>
+  );
+}
+
+function StarPicker({ value, onChange }) {
+  return (
+    <div style={{ display: "flex", gap: 6 }}>
+      {[1, 2, 3, 4, 5].map(n => (
+        <button
+          key={n}
+          type="button"
+          onClick={() => onChange(n)}
+          style={{
+            background: "transparent",
+            border: "none",
+            cursor: "pointer",
+            fontSize: 24,
+            padding: 0,
+            color: n <= value ? "#f5c542" : "#c9c9c9",
+            textShadow: n <= value ? "0 1px 8px rgba(245,197,66,0.35)" : "none"
+          }}
+
+          aria-label={`Rate ${n} star`}
+        >
+          ★
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function Stars({ value = 0 }) {
+  return (
+    <div style={{ display: "flex", gap: 2 }}>
+      {[1, 2, 3, 4, 5].map(n => (
+        <span
+          key={n}
+          style={{
+            fontSize: 22,
+            color: n <= value ? "#f5c542" : "#c9c9c9",
+            textShadow: n <= value ? "0 1px 6px rgba(245,197,66,0.25)" : "none"
+          }}
+        >
+          ★
+        </span>
+
+      ))}
     </div>
   );
 }

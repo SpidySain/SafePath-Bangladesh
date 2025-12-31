@@ -219,3 +219,16 @@
 .featureCard p {
   color: rgba(226, 232, 240, 0.88); /* slate-200 */
 }
+
+.feedbackGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.8rem;
+  margin-top: 2rem;
+}
+
+@media (max-width: 900px) {
+  .feedbackGrid {
+    grid-template-columns: 1fr;
+  }
+}
