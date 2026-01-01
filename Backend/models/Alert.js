@@ -22,7 +22,13 @@ const AlertSchema = new mongoose.Schema(
       default: null
     },
 
-    isActive: { type: Boolean, default: true }
+    isActive: { type: Boolean, default: true },
+
+    expiresAt: {
+      type: Date,
+      default: () => new Date(Date.now() + 24 * 60 * 60 * 1000)
+    }
+
   },
   { timestamps: true }
 );

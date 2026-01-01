@@ -1,135 +1,145 @@
-# 🚦 **SafePath Bangladesh – Digital Road Safety & Reporting Platform**
+# 🚦 **SafePath Bangladesh**
 
-SafePath Bangladesh is a MERN-based platform that enables citizens to report unsafe driving, dangerous road conditions, and vehicle misconduct through a modern digital reporting workflow.
+### Digital Road Safety, Alerts & Awareness Platform (MERN Stack)
 
-The system supports:
+SafePath Bangladesh is a **full-stack MERN web platform** designed to improve road safety in Bangladesh by enabling citizens to **report hazards**, **view verified alerts**, and **receive awareness messages**, while allowing **admins to manage alerts, awareness campaigns, and reports**.
 
-* **Unsafe location reporting**
-* **Vehicle-linked reporting**
-* **QR codes at bus stops & vehicles**
-* **Map visualization of safety reports**
-* **Media uploads**
-* **Basic user history support**
-
-This project was developed as part of a university software engineering course, following requirements-driven development and MVC architecture.
+This project was developed as part of a **university Software Engineering course**, following **requirements-driven development**, **MVC architecture**, and real-world system design principles.
 
 ---
 
-# 📜 **Project Requirements – Coverage & Implementation Status**
+## 🌍 Core Features Overview
 
-## ✔ **Requirement 1 — Unsafe Area / Road Hazard Reporting**
+### 👥 Citizens
+
+* Report unsafe roads & incidents
+* View **live safety alerts**
+* View **expired alerts (labeled)**
+* Receive **awareness messages**
+* Interactive **map-based visualization**
+* QR-based reporting (Location & Vehicle)
+
+### 🛠 Admins
+
+* Create / Enable / Disable **Safety Alerts**
+* Create / Activate **Awareness Messages**
+* View all alerts (active + expired)
+* Dashboard analytics & summaries
+* Control visibility for citizens
+
+---
+
+## 📜 Requirements Coverage & Status
+
+### ✔ Requirement 1 — Unsafe Area / Road Hazard Reporting
 
 **Status: Fully Implemented**
 
-Users can submit reports related to unsafe areas, including:
+* Location-based reporting (manual or QR)
+* GPS coordinates (lat/lng)
+* City, district, area
+* Issue category & severity
+* Optional media upload
+* Reports visible on map
 
-* GPS coordinates (latitude/longitude)
-* City & address
-* Issue category (overspeeding, road damage, etc.)
-* Severity level (1–5)
-* Optional photo/video uploads
-
-**Location QR Codes Supported**
-Format:
+**Location QR Format**
 
 ```
 City|Address|Latitude|Longitude
 ```
 
-Scanning generates an auto-filled report form.
-
 ---
 
-## ⚠ **Requirement 2 — Awareness & Alerts**
-
-**Status: Partially Implemented**
-
-Frontend:
-
-* `AlertsPage` and `AwarenessPage` exist as UI placeholders
-
-Backend:
-
-* No implementation for alerts or campaigns yet
-
----
-
-## ✔ **Requirement 3 — Safety Map Visualization**
+### ✔ Requirement 2 — Alerts & Awareness System
 
 **Status: Fully Implemented**
 
-The platform includes:
+#### Safety Alerts
+
+* Admin creates alerts with:
+
+  * Severity (RED / YELLOW)
+  * Location
+  * Message
+  * Auto expiry (24 hours)
+* Citizens see alerts in:
+
+  * **Top notification banner (active only)**
+  * **Alerts page (active + expired with label)**
+
+#### Awareness Messages
+
+* Admin creates awareness campaigns
+* Admin can activate/deactivate
+* Citizens see awareness:
+
+  * On homepage (campaign section)
+  * As a rotating banner on other pages
+
+---
+
+### ✔ Requirement 3 — Safety Map Visualization
+
+**Status: Fully Implemented**
 
 * Google Maps integration
-* Colored severity zones (green/yellow/orange/red)
-* Report markers with:
+* Severity-based colored zones
+* Markers with:
 
-  * Issue type
-  * Description
-  * City
-  * Severity & timestamp
-
-Uses `@react-google-maps/api`.
+  * Issue
+  * City & area
+  * Severity
+  * Timestamp
 
 ---
 
-## ✔ **Requirement 4 — Vehicle-Linked Reporting**
+### ✔ Requirement 4 — Vehicle-Linked Reporting (QR)
 
 **Status: Fully Implemented**
 
-The system supports scanning **vehicle QR codes** to report:
+* Scan vehicle QR codes
+* Load vehicle details
+* View past issue history
+* Link reports to vehicles
 
-* Reckless driving
-* Overspeeding
-* Rule violations
-* Misconduct by drivers
-
-**Vehicle Features Implemented:**
-
-* Vehicle model with QR code
-* `/api/vehicles/qr/:code` → fetch vehicle details
-* Update vehicle details during report submission
-* Link reports to a specific vehicle
-* Show vehicle’s past issue history
-
----
-
-## ⚠ / ✔ **Requirement 5 — User Profile & History**
-
-**Status: Backend Implemented / Frontend Basic Support**
-
-Backend:
-
-* `/api/reports/user/:userId` → fetch user’s submitted reports
-
-Frontend:
-
-* Fake `AuthContext` simulates user identity
-* Reports page shows history
-
-A dedicated profile page is not implemented yet.
-
----
-
-# 🧠 **QR Code System – Smart Dual-Mode**
-
-The backend automatically identifies whether a QR is:
-
-### **1️⃣ Location QR (Requirement 1)**
+**Vehicle QR API**
 
 ```
-{ 
+GET /api/vehicles/qr/:qrCode
+```
+
+---
+
+### ✔ Requirement 5 — User History & Profile
+
+**Status: Implemented**
+
+* User report history
+* Admin user tracking
+* JWT-based authentication
+* Role-based access (Admin / User)
+
+---
+
+## 🧠 Smart QR Code System
+
+The backend auto-detects QR type:
+
+### 📍 Location QR
+
+```json
+{
   "type": "LOCATION_QR",
-  "city": "...",
-  "address": "...",
-  "latitude": ...,
-  "longitude": ...
+  "city": "Dhaka",
+  "address": "Badda",
+  "latitude": 23.78,
+  "longitude": 90.42
 }
 ```
 
-### **2️⃣ Vehicle QR (Requirement 4)**
+### 🚗 Vehicle QR
 
-```
+```json
 {
   "type": "VEHICLE_QR",
   "vehicle": { ... },
@@ -137,196 +147,269 @@ The backend automatically identifies whether a QR is:
 }
 ```
 
-Frontend adapts dynamically to either case.
+Frontend adapts dynamically.
 
 ---
 
-# 🧩 **Technology Stack**
+## 🧩 Technology Stack
 
-### **Frontend (Local Only, Not in GitHub)**
+### Frontend
 
 * React + Vite
 * React Router
-* qr-scanner
-* Context API for user simulation
-* MVC-style directory structure
-* Google Maps API integration
+* Context API (Auth)
+* Google Maps API
+* Modern component-based UI
+* Admin & User dashboards
 
-### **Backend (Included in this Repository)**
+### Backend
 
 * Node.js + Express
 * MongoDB + Mongoose
-* Multer (file uploads)
-* dotenv
-* CORS
+* JWT Authentication
+* Role-based middleware
 * REST API architecture
+* Multer (media uploads)
+* dotenv & CORS
 
 ---
 
-# 📁 **Folder Structure**
+## 📁 Full Project Structure
 
 ```
 SafePath-Bangladesh/
 │
-├── backend/
+├── Backend/
+│   │
+│   ├── controllers/
+│   │   ├── alertController.js          # Citizen & admin alert logic (expiry, active)
+│   │   ├── awarenessController.js      # Awareness campaigns CRUD
+│   │   ├── authController.js           # Login / register / JWT handling
+│   │   ├── reportController.js         # Road safety reports logic
+│   │   ├── vehicleController.js        # Vehicle & QR based reporting
+│   │   ├── categoryController.js       # Issue categories
+│   │   └── ratingController.js         # Ratings & feedback logic
+│   │
+│   ├── middleware/
+│   │   └── authMiddleware.js            # JWT auth + adminOnly guard
+│   │
 │   ├── models/
-│   │   ├── Report.js
-│   │   ├── Vehicle.js
-│   │   ├── Location.js
-│   │   ├── IssueCategory.js
-│   │   └── MediaAttachment.js
+│   │   ├── Alert.js                    # Safety alert schema (expiry, active)
+│   │   ├── Awareness.js                # Awareness campaign schema
+│   │   ├── Report.js                   # Road hazard report schema
+│   │   ├── Vehicle.js                  # Vehicle & QR schema
+│   │   ├── Location.js                 # Location model
+│   │   ├── IssueCategory.js             # Issue categories
+│   │   └── Rating.js                   # User ratings & feedback
 │   │
 │   ├── routes/
-│   │   ├── reportRoutes.js
-│   │   ├── vehicleRoutes.js
-│   │   ├── categoryRoutes.js
-│   │   └── uploadRoutes.js
+│   │   ├── alertRoutes.js               # Public alert routes
+│   │   ├── awarenessRoutes.js           # Public awareness routes
+│   │   ├── adminRoutes.js               # Admin dashboard routes
+│   │   ├── adminAlertRoutes.js          # Admin alert control routes
+│   │   ├── reportRoutes.js              # Reporting routes
+│   │   ├── vehicleRoutes.js             # Vehicle & QR routes
+│   │   └── categoryRoutes.js            # Issue categories
 │   │
-│   ├── uploads/
-│   ├── server.js
-│   ├── package.json
-│   └── .env.example
+│   ├── uploads/                         # Uploaded images & videos
+│   │
+│   ├── public/
+│   │   └── index.html                   # Backend static serving (if needed)
+│   │
+│   ├── server.js                        # Express app entry point
+│   ├── package.json                    # Backend dependencies
+│   ├── package-lock.json
+│   └── .env.example                    # Environment variables template
 │
-└── README.md
+├── Frontend/
+│   │
+│   ├── public/
+│   │   ├── login-bg.png
+│   │   ├── vite.svg
+│   │   └── index.html
+│   │
+│   ├── src/
+│   │   │
+│   │   ├── assets/
+│   │   │   ├── home-hero.png
+│   │   │   ├── login-hero.png
+│   │   │   └── feature-bg/
+│   │   │       ├── admin.png
+│   │   │       ├── alerts.png
+│   │   │       ├── map.png
+│   │   │       ├── qr.png
+│   │   │       └── report.png
+│   │   │
+│   │   ├── config/
+│   │   │   └── apiClient.js             # Centralized API wrapper
+│   │   │
+│   │   ├── context/
+│   │   │   └── AuthContext.jsx          # Auth & role management
+│   │   │
+│   │   ├── controllers/
+│   │   │   ├── alertController.js       # Alert API calls
+│   │   │   ├── awarenessController.js   # Awareness API calls
+│   │   │   ├── reportController.js      # Report API calls
+│   │   │   ├── vehicleController.js     # Vehicle API calls
+│   │   │   ├── categoryController.js
+│   │   │   └── ratingController.js
+│   │   │
+│   │   ├── data/
+│   │   │   ├── bdLocations.json         # Bangladesh locations dataset
+│   │   │   └── defaultCategories.js
+│   │   │
+│   │   ├── pages/
+│   │   │   ├── LandingPage.jsx
+│   │   │   ├── LoginPage.jsx
+│   │   │   ├── RegisterPage.jsx
+│   │   │   ├── MapPage.jsx
+│   │   │   ├── ReportsPage.jsx
+│   │   │   ├── FilterReportsPage.jsx
+│   │   │   ├── AlertsPage.jsx
+│   │   │   ├── AwarenessPage.jsx
+│   │   │   ├── FeedbacksPage.jsx
+│   │   │   ├── QrPage.jsx
+│   │   │   ├── AdminAlertsPage.jsx
+│   │   │   ├── AdminAwarenessPage.jsx
+│   │   │   └── AdminReportsPage.jsx
+│   │   │
+│   │   ├── views/
+│   │   │   ├── Layout.jsx               # Global layout & banners
+│   │   │   ├── HomeView.jsx
+│   │   │   ├── AlertsBanner.jsx         # Top alert notification banner
+│   │   │   ├── AwarenessBanner.jsx      # Awareness rotating banner
+│   │   │   ├── ReportForm.jsx
+│   │   │   ├── ReportList.jsx
+│   │   │   ├── ReportMap.jsx
+│   │   │   ├── AdminAwarenessManager.jsx
+│   │   │   ├── AdminReportTable.jsx
+│   │   │   └── QrScannerPanel.jsx
+│   │   │
+│   │   ├── utils/
+│   │   │   ├── map.js
+│   │   │   ├── qr.js
+│   │   │   └── reportFilters.js
+│   │   │
+│   │   ├── App.jsx                      # Route definitions
+│   │   ├── main.jsx                     # React entry point
+│   │   ├── index.css
+│   │   └── App.css
+│   │
+│   ├── vite.config.js
+│   ├── package.json
+│   ├── package-lock.json
+│   └── README.md
+│
+└── README.md                            # Root project documentation
 ```
 
 ---
 
-# 🔌 **Backend API Summary**
+## 🔌 Backend API Summary
 
-## **📍 QR Processing**
+### 🚨 Alerts
 
-### `GET /api/reports/from-qr/:qrValue`
-
-→ Returns either LOCATION_QR or VEHICLE_QR format.
-
----
-
-## **📝 Reports**
-
-### `POST /api/reports`
-
-Create a new report:
-
-* Location-only (Req 1)
-* Vehicle-linked (Req 4)
-
-### `GET /api/reports`
-
-List all reports (used in map)
-
-### `GET /api/reports/user/:userId`
-
-User’s report history
+| Method | Endpoint                | Description                   |
+| ------ | ----------------------- | ----------------------------- |
+| GET    | `/api/alerts`           | Active alerts (not expired)   |
+| GET    | `/api/alerts/all`       | All alerts (expired included) |
+| GET    | `/api/admin/alerts`     | Admin – all alerts            |
+| POST   | `/api/admin/alerts`     | Create alert                  |
+| PATCH  | `/api/admin/alerts/:id` | Enable / Disable              |
+| DELETE | `/api/admin/alerts/:id` | Delete                        |
 
 ---
 
-## **🚗 Vehicle**
+### 📢 Awareness
 
-### `GET /api/vehicles/qr/:qrCode`
-
-Fetch vehicle + its issue history
-
-### `PATCH /api/vehicles/:vehicleId`
-
-Update allowed fields
-
----
-
-## **🗂 Categories**
-
-### `GET /api/categories`
-
-### `POST /api/categories`
+| Method | Endpoint                          |
+| ------ | --------------------------------- |
+| GET    | `/api/awareness`                  |
+| GET    | `/api/awareness/admin/all`        |
+| POST   | `/api/awareness/admin/create`     |
+| PATCH  | `/api/awareness/admin/:id`        |
+| PATCH  | `/api/awareness/admin/:id/toggle` |
 
 ---
 
-## **📤 Media Upload**
+### 📝 Reports
 
-### `POST /api/upload/media`
-
-Uploads image/video
-Stored locally in `uploads/` folder
-Accessible at `/uploads/<filename>`
+* `POST /api/reports`
+* `GET /api/reports`
+* `GET /api/reports/user/:userId`
 
 ---
 
-# ⚙️ **How to Run the Project**
+### 🚗 Vehicles
 
-## **1️⃣ Start Backend**
+* `GET /api/vehicles/qr/:qrCode`
+* `PATCH /api/vehicles/:id`
 
-```
-cd backend
+---
+
+## ⚙️ How to Run Locally
+
+### Backend
+
+```bash
+cd Backend
 npm install
 ```
 
-Create `.env`:
+Create `.env`
 
 ```
 MONGO_URI=mongodb://localhost:27017/safepath
 PORT=5000
+JWT_SECRET=your_secret
 ```
 
 Start:
 
-```
+```bash
 npm start
 ```
 
-Backend URL →
-👉 [http://localhost:5000](http://localhost:5000)
-
 ---
 
-## **2️⃣ Start Frontend (Not in This Repo)**
+### Frontend
 
-```
-cd Safepath-frontend
+```bash
+cd Frontend
 npm install
-echo VITE_API_BASE_URL=http://localhost:5000 > .env.local
 npm run dev
 ```
 
-Frontend URL →
-👉 [http://localhost:5173](http://localhost:5173)
+Frontend → [http://localhost:5173](http://localhost:5173)
+Backend → [http://localhost:5000](http://localhost:5000)
 
 ---
 
-# 🗺 **How the System Works (High-Level Flow)**
+## 🔄 Alert Expiry Logic
 
-### **Requirement 1 Flow**
+* Alerts automatically expire after **24 hours**
+* Expired alerts:
 
-1. Scan Location QR **OR** enter location manually
-2. Form auto-fills city/address/lat/lng
-3. User submits unsafe area report
-4. Shown on map with severity zone
-
----
-
-### **Requirement 4 Flow**
-
-1. Scan vehicle QR
-2. System loads vehicle info + past issues
-3. User submits report with optional vehicle updates
-4. Saved with `vehicleId` reference
+  * ❌ Hidden from top banner
+  * ✅ Shown on Alerts page with **EXPIRED label**
+* Admin can still enable/disable expired alerts
 
 ---
 
-# 🚀 **Future Enhancements**
+## 🚀 Future Enhancements
 
-* Admin dashboard for viewing reports
-* User authentication (JWT)
-* Push notification alerts
+* Push notifications
+* Mobile app version
 * Heatmap analytics
-* AI-based report classification
+* AI-based incident classification
+* Public awareness campaign statistics
 
 ---
 
-# 👤 **Author**
+## 👤 Author
 
-
+**SpidySain**
 GitHub: [https://github.com/SpidySain/SafePath-Bangladesh](https://github.com/SpidySain/SafePath-Bangladesh)
 
 ---
-
 

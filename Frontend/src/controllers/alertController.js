@@ -4,6 +4,10 @@ export function fetchActiveAlerts() {
   return apiGet("/api/alerts");
 }
 
+export function fetchAllAlerts() {
+  return apiGet("/api/alerts/all");
+}
+
 // admin
 export function adminFetchAlerts() {
   return apiGet("/api/admin/alerts");
