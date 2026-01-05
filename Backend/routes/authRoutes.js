@@ -35,19 +35,26 @@ router.post("/register", async (req, res) => {
       name,
       email,
       password: hashed,
-      role: role === "ADMIN" ? "ADMIN" : "USER"
+      role: role === "ADMIN" ? "ADMIN" : "USER",
+      receiveAlerts: true
     });
 
     const token = createToken(user);
 
     res.status(201).json({
       message: "User registered",
-      user: { _id: user._id, name: user.name, email: user.email, role: user.role },
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        receiveAlerts: user.receiveAlerts
+      },
       token
     });
   } catch (err) {
     console.error("Register error:", err);
-    res.status(500).json({ message: "Server error", error: err.message });
+    res.status(500).json({ message: "Server error" });
   }
 });
 
@@ -74,19 +81,51 @@ router.post("/login", async (req, res) => {
 
     res.json({
       message: "Login successful",
-      user: { _id: user._id, name: user.name, email: user.email, role: user.role },
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        receiveAlerts: user.receiveAlerts
+      },
       token
     });
   } catch (err) {
     console.error("Login error:", err);
-    res.status(500).json({ message: "Server error", error: err.message });
+    res.status(500).json({ message: "Server error" });
   }
 });
 
-// GET /api/auth/me - returns current authenticated user
+// GET /api/auth/me
 router.get("/me", authMiddleware, async (req, res) => {
-  // req.user is attached in authMiddleware (password excluded)
   res.json({ user: req.user });
 });
 
+// PATCH /api/auth/alerts-toggle
+// Req 5 – Feature 4
+router.patch("/alerts-toggle", authMiddleware, async (req, res) => {
+  try {
+    const { receiveAlerts } = req.body;
+
+    if (typeof receiveAlerts !== "boolean") {
+      return res.status(400).json({ message: "Invalid value" });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      { receiveAlerts },
+      { new: true }
+    );
+
+    return res.json({
+      message: "Alert preference updated",
+      receiveAlerts: user.receiveAlerts
+    });
+  } catch (err) {
+    console.error("Alert toggle error:", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
 module.exports = router;
+
